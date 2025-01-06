@@ -6,7 +6,7 @@
 #    By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/15 17:49:39 by jjs               #+#    #+#              #
-#    Updated: 2025/01/03 12:33:17 by jslusark         ###   ########.fr        #
+#    Updated: 2025/01/06 16:36:35 by jslusark         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -34,6 +34,7 @@ REMOVE = rm -rf
 # Source files
 SRC = main.c \
 	init.c \
+	routine.c \
 	utils.c
 OBJ = $(SRC:.c=.o)
 

@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/01/03 17:26:51 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/01/06 17:44:21 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,34 +36,35 @@
 			~ This will prevent the deadlock condition.
  */
 
-void	thinks()
+void	thinks(t_philos *philo)
 {
-	printf("timestamp_in_ms ID is thinking\n");
-	//usleep(time_to_think * 1000) to simulate time duration
+	printf("%zu philo[%d] is thinking 💭 \n", get_current_ms() - philo->tob, philo->id);
+	// usleep(500000); //to simulate time duration
 	// goes to eat
 }
-void	eats()
+void	eats(t_philos *philo)
 {
 	//takes left fork - lock mutex
 	//takes right fork - lock mutex
-	printf("timestamp_in_ms ID is eating\n");
-	//usleep(time_to_eat * 1000) to simulate time duration
-	// has_eaten++
+	printf("%zu philo[%d] is eating 🍔 \n", get_current_ms() - philo->tob, philo->id);
+	// usleep(500000); //to simulate time duration
+	// philo->has_eaten++;
 	//ended_eating = get_current_time();
 	// goes to sleep
 }
-void	sleeps()
+void	sleeps(t_philos *philo)
 {
 	//put down left fork - release mutex
 	//put down right fork - release mutex
-	printf("timestamp_in_ms ID is sleeping\n");
-	//usleep(time_to_sleep * 1000) to simulate time duration
+	printf("%zu philo[%d] is sleeping 🌙\n", get_current_ms() - philo->tob, philo->id);
+	usleep(500000); //to simulate time duration
 	// goes to think
 }
 
-void	dies() // pilospher should avoid dying
+void	dies(t_philos *philo) // pilospher should avoid dying
 {
 	// if(ended_eating - started_eating > time_to_die)
-	printf("timestamp_in_ms ID is dead\n");
+	printf("%zu philo[%d] is dead 💀\n", get_current_ms() - philo->tob, philo->id);
 	//message should be displayed no more than 10 ms after the actual death of the philosopher.
 }
+

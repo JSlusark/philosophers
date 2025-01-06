@@ -6,33 +6,67 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/01/03 17:24:28 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/01/06 17:53:56 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philos.h"
 
+void	*routine(void *arg)
+{
+	// thread function, what it will do, what happens in the philo lifespan
+	t_philos *philo = (t_philos *)arg; // casting back to t_philos so we can use data of the philosopher struct
+	while (1) // while process is running
+	{
+		printf("👶 philo[%d] is born at %zu\n", philo->id, get_current_ms() - philo->tob);
+		usleep(500000);
+		thinks(philo);
+		eats(philo);
+		sleeps(philo);
+	}
+	return (arg); // exit status will point to the memory of this arg, can be used with pthreadjoin to avoid threads running indefinitely
+}
+
+void start_simulation(t_data *program, t_philos *philo)
+{
+	// create lifespan thread for each philosopher
+	printf("\n - philos_n: %d\n - time_to_die: %d\n - time_to_eat: %d\n - time_to_sleep: %d\n -eat_count: %d\n\n", program->philos_n, program->time_to_die, program->time_to_eat, program->time_to_sleep, program->eat_count);
+	int i;
+	i = 0;
+	(void)philo;
+	while (i < program->philos_n)
+	{
+		// if(program->eat_count >= philo[i].has_eaten) // needs to go in routine as just the respective philo needs to end eating
+		// {
+		// 	// dies(&program->philo[i]); // was just testing this out no nee to be here
+		// 	break;
+		// }
+		pthread_create(&program->philo[i].lifespan, NULL, routine, &program->philo[i]);
+		usleep(500000);
+		i++;
+	}
+}
+
 int init_philos(t_data *program)
 {
 	int i;
 
-	i = 1; // doing i 1 and loop until <= as not starting from 0
-	program->philo = malloc(sizeof(t_philo) * program->philos_n);
+	i = 0;
+	program->philo = malloc(sizeof(t_philos) * program->philos_n);
 	if (!program->philo)
 	{
 		printf("Error: malloc of t_data program->philo failed\n");
 		return(0);
 	}
-	while(i <= program->philos_n)
+	while(i < program->philos_n)
 	{
-		program->philo[i].id = i;
+		program->philo[i].id = i + 1;
 		program->philo[i].has_eaten = 0;
 		program->philo[i].is_eating = 0;
 		program->philo[i].is_sleeping = 0;
 		program->philo[i].is_thinking = 0;
 		program->philo[i].is_dead = 0;
-		program->philo[i].started_eating = get_current_ms(); // no need to initialize here?
-		// program->philo[i].ended_eating = 0; // no need to initialize here?
+		program->philo[i].tob = get_current_ms();
 		program->philo[i].curr_fork = &program->forks[i]; // left fork
 		if (i == 1)
 				program->philo[i].prev_fork = &program->forks[program->philos_n]; // right fork of 1st is the fork of last
@@ -47,8 +81,8 @@ int init_forks(t_data *program)
 {
 	int i;
 
-	i = 1; // doing i 1 and loop until <= as not starting from 0
-	// i know the number of forks needed is philos_n so do not need to malloc?
+	i = 0;
+	//forks[program.philos_n]; ?
 	program->forks = malloc(sizeof(pthread_mutex_t) * program->philos_n);
 	if (!program->forks)
 	{
@@ -65,7 +99,7 @@ int init_forks(t_data *program)
 
 int check_values(t_data *program)
 {
-	printf("INIT.C LINE 17---> philos_n: %d, time_to_die: %d, time_to_eat: %d, time_to_sleep: %d eat_count: %d\n", program->philos_n, program->time_to_die, program->time_to_eat, program->time_to_sleep, program->eat_count);
+	// printf("INIT.C LINE 17---> philos_n: %d, time_to_die: %d, time_to_eat: %d, time_to_sleep: %d eat_count: %d\n", program->philos_n, program->time_to_die, program->time_to_eat, program->time_to_sleep, program->eat_count);
 	if(program->philos_n < 1 || program->time_to_die < 1 || program->time_to_eat < 1 || program->time_to_sleep < 1)
 	{
 		printf("Error: the first 4 values should be greater than 0\n");
