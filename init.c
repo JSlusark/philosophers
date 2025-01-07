@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/01/06 17:53:56 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/01/07 16:36:58 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,35 +16,71 @@ void	*routine(void *arg)
 {
 	// thread function, what it will do, what happens in the philo lifespan
 	t_philos *philo = (t_philos *)arg; // casting back to t_philos so we can use data of the philosopher struct
-	while (1) // while process is running
-	{
-		printf("👶 philo[%d] is born at %zu\n", philo->id, get_current_ms() - philo->tob);
-		usleep(500000);
-		thinks(philo);
-		eats(philo);
-		sleeps(philo);
-	}
-	return (arg); // exit status will point to the memory of this arg, can be used with pthreadjoin to avoid threads running indefinitely
+	// while (1) // while process is running
+	// {
+		// philo->meal_wait = 1000;
+		if(philo->status.is_born == 0)
+		{
+			printf("👶 philo[%d] is born at %zu\n", philo->id, get_current_ms() - philo->tob);
+			philo->status.is_born = 1;
+		}
+		else
+		{
+			if(philo->meals_n < philo->args.meals_limit && philo->status.is_dead == 0)
+			{
+				// printf("philo[%d] is alive\n", philo->id);
+				if(philo->status.is_thinking == 0)
+				{
+					thinks(philo);
+					philo->status.is_thinking = 1;
+				}
+				else if(philo->status.is_eating == 0)
+				{
+					eats(philo);
+					philo->meals_n++;
+					philo->status.is_eating = 1;
+				}
+				else if(philo->status.is_sleeping == 0)
+				{
+					sleeps(philo);
+					philo->status.is_sleeping = 1;
+				}
+				if(philo->meal_start >= (size_t)philo->args.ttd)
+				{
+					printf("💀 %zu philo[%d] died\n",  get_current_ms() - philo->tob, philo->id);
+					philo->status.is_dead = 1;
+				}
+			}
+		}
+	// }
+	return (philo); // exit status will point to the memory of this arg, can be used with pthreadjoin to avoid threads running indefinitely
 }
 
-void start_simulation(t_data *program, t_philos *philo)
+int start_simulation(t_data *program, t_philos *philo)
 {
 	// create lifespan thread for each philosopher
-	printf("\n - philos_n: %d\n - time_to_die: %d\n - time_to_eat: %d\n - time_to_sleep: %d\n -eat_count: %d\n\n", program->philos_n, program->time_to_die, program->time_to_eat, program->time_to_sleep, program->eat_count);
+	printf("\n - philos_n: %d\n - ttd: %d\n - tte: %d\n - tts: %d\n - meals_limit: %d\n\n", program->args.philos_n, program->args.ttd * 1000, program->args.tte * 1000, program->args.tts * 1000, program->args.meals_limit);
 	int i;
 	i = 0;
 	(void)philo;
-	while (i < program->philos_n)
+	while (i < program->args.philos_n)
 	{
-		// if(program->eat_count >= philo[i].has_eaten) // needs to go in routine as just the respective philo needs to end eating
-		// {
-		// 	// dies(&program->philo[i]); // was just testing this out no nee to be here
-		// 	break;
-		// }
-		pthread_create(&program->philo[i].lifespan, NULL, routine, &program->philo[i]);
-		usleep(500000);
+		if(pthread_create(&program->philo[i].lifespan, NULL, routine, &program->philo[i]) != 0)
+			{
+				printf("Error: failed to create thread\n"); // should I also destroy all threads and mutexes here?
+				return(0);
+			}
+		if(philo[i].meals_n == program->args.meals_limit || philo[i].status.is_dead == 1)
+		{
+			// dies(&program->philo[i]); // was just testing this out no nee to be here
+			printf("👶 philo[%d] MEAL TIMES %d MEAL LIMIT %d\n", philo->id, philo[i].meals_n, program->args.meals_limit );
+			break;
+		}
+		// usleep(5000);
+		pthread_join(program->philo[i].lifespan, NULL);
 		i++;
 	}
+	return(1);
 }
 
 int init_philos(t_data *program)
@@ -52,24 +88,21 @@ int init_philos(t_data *program)
 	int i;
 
 	i = 0;
-	program->philo = malloc(sizeof(t_philos) * program->philos_n);
+	program->philo = malloc(sizeof(t_philos) * program->args.philos_n);
 	if (!program->philo)
 	{
 		printf("Error: malloc of t_data program->philo failed\n");
 		return(0);
 	}
-	while(i < program->philos_n)
+	while(i < program->args.philos_n)
 	{
 		program->philo[i].id = i + 1;
-		program->philo[i].has_eaten = 0;
-		program->philo[i].is_eating = 0;
-		program->philo[i].is_sleeping = 0;
-		program->philo[i].is_thinking = 0;
-		program->philo[i].is_dead = 0;
 		program->philo[i].tob = get_current_ms();
+		program->philo[i].meals_n = 0;
 		program->philo[i].curr_fork = &program->forks[i]; // left fork
+		program->philo[i].args = program->args;
 		if (i == 1)
-				program->philo[i].prev_fork = &program->forks[program->philos_n]; // right fork of 1st is the fork of last
+				program->philo[i].prev_fork = &program->forks[program->args.philos_n]; // right fork of 1st is the fork of last
 		else
 				program->philo[i].prev_fork = &program->forks[i - 1]; // right fork is the fork of previous philosopher
 		i++;
@@ -83,13 +116,13 @@ int init_forks(t_data *program)
 
 	i = 0;
 	//forks[program.philos_n]; ?
-	program->forks = malloc(sizeof(pthread_mutex_t) * program->philos_n);
+	program->forks = malloc(sizeof(pthread_mutex_t) * program->args.philos_n);
 	if (!program->forks)
 	{
 		printf("Error: malloc of t_data program->forks failed\n");
 		return(0);
 	}
-	while(i <= program->philos_n)
+	while(i <= program->args.philos_n)
 	{
 		pthread_mutex_init(&program->forks[i], NULL);
 		i++;
@@ -97,20 +130,20 @@ int init_forks(t_data *program)
 	return(1);
 }
 
-int check_values(t_data *program)
+int check_values(t_rules *args)
 {
-	// printf("INIT.C LINE 17---> philos_n: %d, time_to_die: %d, time_to_eat: %d, time_to_sleep: %d eat_count: %d\n", program->philos_n, program->time_to_die, program->time_to_eat, program->time_to_sleep, program->eat_count);
-	if(program->philos_n < 1 || program->time_to_die < 1 || program->time_to_eat < 1 || program->time_to_sleep < 1)
+	// printf("INIT.C LINE 17---> philos_n: %d, ttd: %d, tte: %d, tts: %d meals_limit: %d\n", args->philos_n, args->ttd, args->tte, args->tts, args->meals_limit);
+	if(args->philos_n < 1 || args->ttd < 1 || args->tte < 1 || args->tts < 1)
 	{
 		printf("Error: the first 4 values should be greater than 0\n");
 		return(0);
 	}
-	if(program->eat_count < 0)
+	if(args->meals_limit < 0)
 	{
-		printf("Error: the 5th value(eat_count) should not be negative\n");// check if condition needed for eat_count
+		printf("Error: the 5th value(meals_limit) should not be negative\n");// check if condition needed for meals_limit
 		return(0);
 	}
-	if(program->philos_n > 200)
+	if(args->philos_n > 200)
 	{
 		printf("Error: not allowed to test philos_n greater than 200\n"); // check if needed
 		return(0);
@@ -119,17 +152,17 @@ int check_values(t_data *program)
 	return(1);
 }
 
-int	init_data(int argc, char **argv, t_data *program)
+int	init_data(int argc, char **argv, t_data *program, t_rules *args)
 {
-	program->philos_n = ft_atoi(argv[1]); // i have to hanldle letters? should not give 0??
-	program->time_to_die = ft_atoi(argv[2]);
-	program->time_to_eat = ft_atoi(argv[3]);
-	program->time_to_sleep = ft_atoi(argv[4]);
+	args->philos_n = ft_atoi(argv[1]); // i have to hanldle letters? should not give 0??
+	args->ttd = ft_atoi(argv[2]);
+	args->tte = ft_atoi(argv[3]);
+	args->tts = ft_atoi(argv[4]);
 	if (argc == 6)
-		program->eat_count = ft_atoi(argv[5]);
+		args->meals_limit = ft_atoi(argv[5]);
 	else
-		program->eat_count = 0; // what happens when this is not added?
-	if(!check_values(program))
+		args->meals_limit = 0; // what happens when this is not added?
+	if(!check_values(args))
 		return(0);
 	if(!init_forks(program))
 		return(0);
