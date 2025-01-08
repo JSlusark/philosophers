@@ -6,13 +6,18 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 15:05:39 by jslusark          #+#    #+#             */
-/*   Updated: 2025/01/03 17:42:50 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/01/08 15:49:45 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philos.h"
 
-long get_current_ms(void) // long is unlikely to overflow as the simiulation will not run indefinitely
+size_t get_curr_ms(long start)
+{
+	return (get_unix_timestamp() - start);
+}
+
+long get_unix_timestamp(void) // long is unlikely to overflow as the simiulation will not run indefinitely
 {
 	// builtin struct that stores time in seconds and microseconds
 	//tv_sec: Seconds since January 1, 1970 (the "unix epoch").

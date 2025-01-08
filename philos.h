@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:47:09 by jslusark          #+#    #+#             */
-/*   Updated: 2025/01/07 16:00:56 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/01/08 15:50:09 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ typedef struct s_rules
 	int				ttd; // time limit a philo can stay without eating, if surpassed philo dies and simulation stops
 	int				tte; // time it takes for each philo to eat
 	int				tts; // time it takes for each philo to sleep
+	long			unix_start;
 }	t_rules;
 
 typedef struct s_props // not assigning as null by default
@@ -68,7 +69,8 @@ typedef	struct s_data
 
 //utility functions
 int	ft_atoi(const char *nptr);
-long get_current_ms(void); // to be subctracted from tob to get passing time in ms
+long get_unix_timestamp(void); // to be subctracted from tob to get passing time in ms
+size_t get_curr_ms(long start);
 
 //parsing checks
 int	parse_args(int argc);

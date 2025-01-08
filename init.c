@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/01/07 16:36:58 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/01/08 15:56:40 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,10 @@ void	*routine(void *arg)
 	// while (1) // while process is running
 	// {
 		// philo->meal_wait = 1000;
+		philo->tob = get_curr_ms(philo->args.unix_start);
 		if(philo->status.is_born == 0)
 		{
-			printf("👶 philo[%d] is born at %zu\n", philo->id, get_current_ms() - philo->tob);
+			printf("👶 philo[%d] is born at %zu\n", philo->id, philo->tob);
 			philo->status.is_born = 1;
 		}
 		else
@@ -47,19 +48,20 @@ void	*routine(void *arg)
 				}
 				if(philo->meal_start >= (size_t)philo->args.ttd)
 				{
-					printf("💀 %zu philo[%d] died\n",  get_current_ms() - philo->tob, philo->id);
+					printf("💀 %zu philo[%d] died\n",  get_unix_timestamp() - philo->tob, philo->id);
 					philo->status.is_dead = 1;
 				}
 			}
 		}
 	// }
+	usleep(philo->args.ttd * 1000); //milliseconds tp microseconds
 	return (philo); // exit status will point to the memory of this arg, can be used with pthreadjoin to avoid threads running indefinitely
 }
 
 int start_simulation(t_data *program, t_philos *philo)
 {
 	// create lifespan thread for each philosopher
-	printf("\n - philos_n: %d\n - ttd: %d\n - tte: %d\n - tts: %d\n - meals_limit: %d\n\n", program->args.philos_n, program->args.ttd * 1000, program->args.tte * 1000, program->args.tts * 1000, program->args.meals_limit);
+	printf("\n - philos_n: %d\n - ttd: %d\n - tte: %d\n - tts: %d\n - meals_limit: %d\n\n", program->args.philos_n, program->args.ttd, program->args.tte, program->args.tts, program->args.meals_limit);
 	int i;
 	i = 0;
 	(void)philo;
@@ -76,7 +78,6 @@ int start_simulation(t_data *program, t_philos *philo)
 			printf("👶 philo[%d] MEAL TIMES %d MEAL LIMIT %d\n", philo->id, philo[i].meals_n, program->args.meals_limit );
 			break;
 		}
-		// usleep(5000);
 		pthread_join(program->philo[i].lifespan, NULL);
 		i++;
 	}
@@ -97,7 +98,7 @@ int init_philos(t_data *program)
 	while(i < program->args.philos_n)
 	{
 		program->philo[i].id = i + 1;
-		program->philo[i].tob = get_current_ms();
+		// program->philo[i].tob = get_unix_timestamp();
 		program->philo[i].meals_n = 0;
 		program->philo[i].curr_fork = &program->forks[i]; // left fork
 		program->philo[i].args = program->args;
@@ -155,9 +156,10 @@ int check_values(t_rules *args)
 int	init_data(int argc, char **argv, t_data *program, t_rules *args)
 {
 	args->philos_n = ft_atoi(argv[1]); // i have to hanldle letters? should not give 0??
-	args->ttd = ft_atoi(argv[2]);
-	args->tte = ft_atoi(argv[3]);
-	args->tts = ft_atoi(argv[4]);
+	args->ttd = ft_atoi(argv[2]) * 1000;
+	args->tte = ft_atoi(argv[3]) * 1000;
+	args->tts = ft_atoi(argv[4]) * 1000;
+	args->unix_start = get_unix_timestamp(); // it's already in ms
 	if (argc == 6)
 		args->meals_limit = ft_atoi(argv[5]);
 	else

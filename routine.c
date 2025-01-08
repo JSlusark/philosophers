@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/01/07 16:34:31 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/01/08 15:41:02 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@
 
 void	thinks(t_philos *philo)
 {
-	philo->curr_t = get_current_ms() - philo->tob;
+	philo->curr_t = get_unix_timestamp() - philo->tob;
 	philo->status.is_eating = 0;
 	// philo->status.is_sleeping = 0;
 	printf("💭 %zu philo[%d] is thinking\n", philo->curr_t, philo->id);
@@ -49,13 +49,13 @@ void	eats(t_philos *philo)
 {
 	//takes left fork - lock mutex
 	//takes right fork - lock mutex
-	philo->meal_start = get_current_ms() - philo->tob;
+	philo->meal_start = get_unix_timestamp() - philo->tob;
 	philo->status.is_eating = 1;
 	philo->status.is_sleeping = 0;
 	printf("🍔 %zu philo[%d] started eating\n", philo->meal_start, philo->id);
 	// philo->meals_n++;
 	// usleep(philo->args.tte * 1000); //to simulate time duration
-	// philo->meal_end = get_current_ms() - philo->tob;
+	// philo->meal_end = get_unix_timestamp() - philo->tob;
 	// printf("🍽️ %zu philo[%d] ended eating\n", philo->meal_end, philo->id);
 	// goes to sleep
 }
@@ -63,7 +63,7 @@ void	sleeps(t_philos *philo)
 {
 	//put down left fork - release mutex
 	//put down right fork - release mutex
-	philo->curr_t = get_current_ms() - philo->tob;
+	philo->curr_t = get_unix_timestamp() - philo->tob;
 	philo->status.is_thinking = 0;
 	// philo->status.is_eating = 0;
 	printf("🌙 %zu philo[%d] is sleeping\n", philo->curr_t, philo->id);
@@ -74,7 +74,7 @@ void	sleeps(t_philos *philo)
 void	dies(t_philos *philo) // pilospher should avoid dying
 {
 	// if(meal_end - meal_start > ttd)
-	printf("%zu philo[%d] is dead 💀\n", get_current_ms() - philo->tob, philo->id);
+	printf("%zu philo[%d] is dead 💀\n", get_unix_timestamp() - philo->tob, philo->id);
 	//message should be displayed no more than 10 ms after the actual death of the philosopher.
 }
 
