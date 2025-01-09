@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:47:09 by jslusark          #+#    #+#             */
-/*   Updated: 2025/01/09 14:35:18 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/01/09 15:42:07 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ typedef struct s_rules
 typedef struct s_props // not assigning as null by default
 {
 	int is_born;
+	int is_alive;
 	int is_thinking;
 	int is_eating;
 	int is_sleeping;

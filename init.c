@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/01/09 14:34:08 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/01/09 15:50:11 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,24 @@ void	*routine(void *arg)
 	pthread_mutex_lock(&born_lock);
 	alive += 1;
 	born = 1;
+	philo->status.is_alive = 1;
 	philo->tob = get_curr_ms(philo->args.unix_start); // if outside the locks it will all philos will have the same timestamp
 	if(born == 1)
 		printf("👶 philo[%d] is born at %zu\n", philo->id, philo->tob); // ourput in milliseconds
 	born = 0;
 	usleep(1000000);
 	pthread_mutex_unlock(&born_lock);
+	int talk = 0;
+	while(philo->status.is_alive == 1)
+	{
+		printf("💬 hey this is philo[%d]\n", philo->id);
+		talk++;
+		if (talk == 3)
+		{
+			printf("💥 philo[%d] ended convo, n of convos %d\n", philo->id, talk);
+			break;
+		}
+	}
 	return (NULL);
 }
 int start_simulation(t_data *program, t_philos *philo)
