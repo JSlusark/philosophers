@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/01/08 15:41:02 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/01/09 13:01:14 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,12 +47,14 @@ void	thinks(t_philos *philo)
 }
 void	eats(t_philos *philo)
 {
-	//takes left fork - lock mutex
-	//takes right fork - lock mutex
+	//takes left fork - phtread_mutex_lock (philo->left_fork)
+	//takes right fork - phtread_mutex_lock (philo->right_fork)
 	philo->meal_start = get_unix_timestamp() - philo->tob;
 	philo->status.is_eating = 1;
 	philo->status.is_sleeping = 0;
 	printf("🍔 %zu philo[%d] started eating\n", philo->meal_start, philo->id);
+	//takes left fork - phtread_mutex_unlock (philo->left_fork)
+	//takes right fork - phtread_mutex_unlock (philo->right_fork)
 	// philo->meals_n++;
 	// usleep(philo->args.tte * 1000); //to simulate time duration
 	// philo->meal_end = get_unix_timestamp() - philo->tob;

@@ -6,7 +6,7 @@
 #    By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/15 17:49:39 by jjs               #+#    #+#              #
-#    Updated: 2025/01/09 12:33:45 by jslusark         ###   ########.fr        #
+#    Updated: 2025/01/09 12:45:56 by jslusark         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,9 +27,9 @@ FAILURE = $(RED)Failure:$(RESET)
 IDLE = $(BLUE)Idle:$(RESET)
 
 # Compiler flags and commands
-# -fsanitize=address
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -fsanitize=address -g
+# CFLAGS = -Wall -Wextra -Werror -fsanitize=address -g
+CFLAGS = -Wall -Wextra -Werror -g
 REMOVE = rm -rf
 
 # Source files

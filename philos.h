@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:47:09 by jslusark          #+#    #+#             */
-/*   Updated: 2025/01/08 15:50:09 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/01/09 14:35:18 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,9 +51,9 @@ typedef struct s_philos // struct for each philosopher
 	size_t			meal_wait; // counter to see if philo has eaten before ttd
 	size_t			meal_start; // timestamp of when philo starts eating
 	size_t			meal_end; // timestamp to check last meal and if exceeding ttd philo has to die
-	pthread_mutex_t	*curr_fork; // left fork
-	pthread_mutex_t	*prev_fork; // right fork
-	t_rules args; // struct to store the arguments
+	pthread_mutex_t	*left_fork; // left fork
+	pthread_mutex_t	*right_fork; // right fork
+	t_rules				args; // struct to store the arguments
 	// pthread_mutex_t *next_fork; // left of left fork -- curious if this can help more later
 } t_philos;
 
