@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:47:09 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/03 14:58:14 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/03 15:56:18 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,17 +29,19 @@ typedef struct s_rules
 	int				ttd; // time limit a philo can stay without eating, if surpassed philo dies and simulation stops
 	int				tte; // time it takes for each philo to eat
 	int				tts; // time it takes for each philo to sleep
+	bool			found_dead; // flag for checking if a philo has died and stops the simulation
 	long			unix_start;
 }	t_rules;
 
 typedef struct s_props // not assigning as null by default
 {
-	int is_born;
-	int is_alive;
-	int is_thinking;
-	int is_eating;
-	int is_sleeping;
-	int is_dead;
+	bool is_born;
+	bool is_alive;
+	bool is_thinking;
+	bool is_eating;
+	bool is_sleeping;
+	bool is_dead;
+	bool is_full;
 }	t_props;
 
 typedef struct s_philos // struct for each philosopher
@@ -47,7 +49,7 @@ typedef struct s_philos // struct for each philosopher
 	int				id; // index of philosopher in struct array, can be useful with phtread_join/pthread_detach
 	pthread_t		lifespan; // thread of each philosopher's lifespan
 	size_t			tob; // time of birth timestamp
-	size_t			curr_t; // time of birth timestamp
+	size_t			curr_t; // start of action timestamp
 	t_props			status; // struct to manage the status of each philosopher
 	int				meals_n; // number of times philo has eaten - null by default
 	size_t			meal_wait; // counter to see if philo has eaten before ttd
@@ -65,7 +67,7 @@ typedef	struct s_data
 	t_rules args; // struct to store the arguments
 	t_philos	*philo; // array of structs (each struct is a philosopher)
 	pthread_mutex_t *forks; // array of mutexs (each mutex is a fork)
-	int	is_dead; // flag to stop simulation
+	// bool	is_dead; // flag to stop simulation ---- works better in args i think
 	int *forks_taken;
 }	t_data;
 

@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/03 14:59:32 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/03 15:54:39 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void	*routine(void *arg)
 	pthread_mutex_lock(&born_lock);
 	alive += 1;
 	born = 1;
-	philo->status.is_alive = 1;
+	philo->status.is_alive = true;
 	philo->tob = get_curr_ms(philo->args.unix_start); // if outside the locks it will all philos will have the same timestamp
 	if(born == 1)
 		printf("👶 philo[%d] is born at %zu\n", philo->id, philo->tob); // ourput in milliseconds
@@ -31,7 +31,7 @@ void	*routine(void *arg)
 	usleep(1000000);
 	pthread_mutex_unlock(&born_lock);
 	int talk = 0;
-	while(philo->status.is_alive == 1)
+	while(philo->status.is_alive)
 	{
 		printf("💬 hey this is philo[%d]\n", philo->id);
 		talk++;
@@ -139,11 +139,11 @@ bool	init_data(int argc, char **argv, t_data *program, t_rules *args)
 	args->ttd = ft_atoi(argv[2]); // check if more convenient to convert everything into microseconds and then use usleep with t/1000 to show milliseconds
 	args->tte = ft_atoi(argv[3]);
 	args->tts = ft_atoi(argv[4]);
-	args->unix_start = get_unix_timestamp(); // ms since 1970 to start of program, does not need conversion
+	args->unix_start = get_unix_timestamp(); // ms since 1970 to start of program, does not need conversion (it's in milliseconds)
 	if (argc == 6)
 	{
 		args->meals_limit = ft_atoi(argv[5]);
-			if(args->meals_limit < 0)
+		if(args->meals_limit < 0)
 		{
 			printf("Error: the 5th value(meals_limit) should not be negative\n");// check if condition needed for meals_limit
 			return (false);
