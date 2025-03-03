@@ -6,7 +6,7 @@
 #    By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/15 17:49:39 by jjs               #+#    #+#              #
-#    Updated: 2025/03/03 15:00:32 by jslusark         ###   ########.fr        #
+#    Updated: 2025/03/03 15:10:25 by jslusark         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -37,10 +37,12 @@ SRC = main.c \
 	init.c \
 	routine.c \
 	utils.c
-OBJ = $(SRC:.c=.o)
+OBJ_DIR = obj
+OBJ = $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))
 
 # Compile object files
-%.o: %.c
+$(OBJ_DIR)/%.o: %.c
+	@mkdir -p $(OBJ_DIR)
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 #Executable name
@@ -57,8 +59,8 @@ $(NAME): $(OBJ)
 
 # Clean object files
 clean:
-	@if ls $(OBJ) >/dev/null 2>&1; then \
-		$(REMOVE) $(OBJ); \
+	@if ls $(OBJ_DIR)/*.o >/dev/null 2>&1; then \
+		$(REMOVE) $(OBJ_DIR); \
 		echo "$(WARNING) removed $(MAGENTA)$(NAME)$(RESET) object files"; \
 	else \
 		echo "$(IDLE) object files were already cleaned"; \
