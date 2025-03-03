@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philos.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:47:09 by jslusark          #+#    #+#             */
-/*   Updated: 2025/01/09 15:42:07 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/03 14:58:14 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <unistd.h>     // write, usleep
 #include <sys/time.h>   // gettimeofday
 #include <pthread.h>    // pthread_create, pthread_detach , pthread_join, pthread_mutex_init, pthread_mutex_destroy, pthread_mutex_lock, pthread_mutex_unlock
+#include <stdbool.h> // added to use bool type instead thna 0/1
 
 typedef struct s_rules
 {
@@ -74,16 +75,16 @@ long get_unix_timestamp(void); // to be subctracted from tob to get passing time
 size_t get_curr_ms(long start);
 
 //parsing checks
-int	parse_args(int argc);
-int check_values(t_rules *args); // called in init_data
+bool	parse_args(int argc);
+bool check_values(t_rules *args); // called in init_data
 
 // init functions
-int	init_data(int argc, char **argv, t_data *program, t_rules *args);
-int init_forks(t_data *program);
-int init_philos(t_data *program);
+bool	init_data(int argc, char **argv, t_data *program, t_rules *args);
+bool init_forks(t_data *program);
+bool init_philos(t_data *program);
 
 // simulation functions
-int	start_simulation(t_data *program, t_philos *philo); // starts threads
+bool	start_simulation(t_data *program, t_philos *philo); // starts threads
 void	*routine(void *arg); // starts the routine of each philosopher
 void	thinks(t_philos *philo); // action
 void	eats(t_philos *philo); // action

@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+         #
+#    By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/15 17:49:39 by jjs               #+#    #+#              #
-#    Updated: 2025/01/09 12:45:56 by jslusark         ###   ########.fr        #
+#    Updated: 2025/03/03 15:00:32 by jslusark         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -86,3 +86,7 @@ re: fclean all
 	@echo "- $(GREEN)make fclean$(RESET): removes object files and the final library"
 
 .PHONY: all clean fclean re %
+
+# Calling helgrind to check for data races
+helgrind:
+	@valgrind --tool=helgrind ./$(NAME)

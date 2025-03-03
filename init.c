@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/01/09 15:50:11 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/03 14:59:32 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,10 +43,11 @@ void	*routine(void *arg)
 	}
 	return (NULL);
 }
-int start_simulation(t_data *program, t_philos *philo)
+bool	start_simulation(t_data *program, t_philos *philo)
 {
 	// printf("\n - philos_n: %d\n - ttd: %d\n - tte: %d\n - tts: %d\n - meals_limit: %d\n\n", program->args.philos_n, program->args.ttd, program->args.tte, program->args.tts, program->args.meals_limit);
 	int i;
+
 	i = 0;
 	(void)philo;
 	while (i < program->args.philos_n)
@@ -54,7 +55,7 @@ int start_simulation(t_data *program, t_philos *philo)
 		if(pthread_create(&program->philo[i].lifespan, NULL, routine, &program->philo[i]) != 0)
 		{
 			printf("Error: failed to create thread\n"); // should I also destroy all threads and mutexes here?
-			return(0);
+			return (false);
 		}
 		i++;
 	}
@@ -65,10 +66,10 @@ int start_simulation(t_data *program, t_philos *philo)
 		i++;
 	}
 	printf("%d philos are alive\n", alive);
-	return(1);
+	return(true);
 }
 
-int init_philos(t_data *program)
+bool	init_philos(t_data *program)
 {
 	int i;
 
@@ -76,7 +77,7 @@ int init_philos(t_data *program)
 	if (!program->philo)
 	{
 		printf("Error: malloc of t_data program->philo failed\n");
-		return(0);
+		return (false);
 	}
 	i = 0; // as it's an array we loop from 0 to philos_n - 1 (we then print +1 to show the actual n)
 	while(i < program->args.philos_n)
@@ -92,10 +93,10 @@ int init_philos(t_data *program)
 				program->philo[i].right_fork = &program->forks[i - 1]; // right fork is the fork of previous philosopher
 		i++;
 	}
-	return(1);
+	return (true);
 }
 
-int init_forks(t_data *program)
+bool	init_forks(t_data *program)
 {
 	int i;
 
@@ -103,7 +104,7 @@ int init_forks(t_data *program)
 	if (!program->forks)
 	{
 		printf("Error: malloc of t_data program->forks failed\n");
-		return(0);
+		return (false);
 	}
 	i = 0; // as it's an array we loop from 0 to philos_n - 1
 	while(i < program->args.philos_n) // if philos_n is 50, we have 50 forks indexed 0 to 49
@@ -111,27 +112,27 @@ int init_forks(t_data *program)
 		pthread_mutex_init(&program->forks[i], NULL);
 		i++;
 	}
-	return(1);
+	return(true);
 }
 
-int check_values(t_rules *args)
+bool	check_values(t_rules *args)
 {
 	// printf("INIT.C LINE 17---> philos_n: %d, ttd: %d, tte: %d, tts: %d meals_limit: %d\n", args->philos_n, args->ttd, args->tte, args->tts, args->meals_limit);
 	if(args->philos_n < 1 || args->ttd < 1 || args->tte < 1 || args->tts < 1)
 	{
 		printf("Error: the first 4 values should be greater than 0\n"); // check if greater than 0 or -1
-		return(0);
+		return (false);
 	}
 	if(args->philos_n > 200)
 	{
 		printf("Error: not allowed to test philos_n greater than 200\n"); // check if needed
-		return(0);
+		return (false);
 	}
 	// what about intmax limit?
-	return(1);
+	return (true);
 }
 
-int	init_data(int argc, char **argv, t_data *program, t_rules *args)
+bool	init_data(int argc, char **argv, t_data *program, t_rules *args)
 {
 	// program = malloc(sizeof(t_data));
 	args->philos_n = ft_atoi(argv[1]); // i have to hanldle letters? should not give 0??
@@ -145,16 +146,16 @@ int	init_data(int argc, char **argv, t_data *program, t_rules *args)
 			if(args->meals_limit < 0)
 		{
 			printf("Error: the 5th value(meals_limit) should not be negative\n");// check if condition needed for meals_limit
-			return(0);
+			return (false);
 		}
 	}
 	else
 		args->meals_limit = -1; // no limit should be given if not inputed from the user
 	if(!check_values(args))
-		return(0);
+		return (false);
 	if(!init_forks(program))
-		return(0);
+		return (false);
 	if(!init_philos(program))
-		return(0);
-	return (1);
+		return (false);
+	return (true);
 }
