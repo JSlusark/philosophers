@@ -3,46 +3,45 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/03 15:54:39 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/05 20:06:17 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philos.h"
 
-int born = 0;
-int alive = 0;
-pthread_mutex_t born_lock = PTHREAD_MUTEX_INITIALIZER;
-
-void	*routine(void *arg)
+void *routine(void *arg)
 {
-	t_philos *philo = (t_philos *)arg; // casting back to t_philos so we can use data of the philosopher struct
-	(void)philo;
-	pthread_mutex_lock(&born_lock);
-	alive += 1;
-	born = 1;
+	t_philos *philo = (t_philos *)arg;
+
 	philo->status.is_alive = true;
-	philo->tob = get_curr_ms(philo->args.unix_start); // if outside the locks it will all philos will have the same timestamp
-	if(born == 1)
-		printf("👶 philo[%d] is born at %zu\n", philo->id, philo->tob); // ourput in milliseconds
-	born = 0;
-	usleep(1000000);
-	pthread_mutex_unlock(&born_lock);
-	int talk = 0;
-	while(philo->status.is_alive)
+	philo->status.is_sleeping = false;
+	philo->status.is_eating = false;
+	philo->status.is_thinking = false;
+	// philo->status.is_full = false;
+	philo->tob = get_curr_ms(philo->args.unix_start); // Start timestamp
+	while (philo->status.is_alive) // Infinite loop until death
 	{
-		printf("💬 hey this is philo[%d]\n", philo->id);
-		talk++;
-		if (talk == 3)
+		// Thinking state
+		if (philo->id % 2 == 0)
+			eats(philo, philo->right_fork, philo->left_fork); // even takes right first and left second
+		else
+			eats(philo, philo->left_fork, philo->right_fork); // odd takes left first and right second
+		// if(philo)
+		sleeps(philo);
+		thinks(philo);
+		if (!philo->status.is_alive)
 		{
-			printf("💥 philo[%d] ended convo, n of convos %d\n", philo->id, talk);
 			break;
+			/* code */
 		}
 	}
-	return (NULL);
+
+	return NULL;
 }
+
 bool	start_simulation(t_data *program, t_philos *philo)
 {
 	// printf("\n - philos_n: %d\n - ttd: %d\n - tte: %d\n - tts: %d\n - meals_limit: %d\n\n", program->args.philos_n, program->args.ttd, program->args.tte, program->args.tts, program->args.meals_limit);
@@ -52,7 +51,7 @@ bool	start_simulation(t_data *program, t_philos *philo)
 	(void)philo;
 	while (i < program->args.philos_n)
 	{
-		if(pthread_create(&program->philo[i].lifespan, NULL, routine, &program->philo[i]) != 0)
+		if(pthread_create(&program->philo[i].lifespan, NULL, &routine, &program->philo[i]) != 0)
 		{
 			printf("Error: failed to create thread\n"); // should I also destroy all threads and mutexes here?
 			return (false);
@@ -65,7 +64,6 @@ bool	start_simulation(t_data *program, t_philos *philo)
 		pthread_join(program->philo[i].lifespan, NULL);// <- stops threads from running -.-''
 		i++;
 	}
-	printf("%d philos are alive\n", alive);
 	return(true);
 }
 
@@ -87,7 +85,7 @@ bool	init_philos(t_data *program)
 		// program->philo[i].tob = get_unix_timestamp();
 		program->philo[i].meals_n = 0;
 		program->philo[i].left_fork = &program->forks[i]; // left fork for philo_n 0 (1) it's fork 0 (1)
-		if (i == 1)// if total philos if 50, the r_f of philo 1 (0 i) is the l_f of philo 50 (49 i so philo_n - 1)
+		if (i == 0)// if total philos if 50, the r_f of philo 1 (0 i) is the l_f of philo 50 (49 i so philo_n - 1)
 				program->philo[i].right_fork = &program->forks[program->args.philos_n - 1 ]; // right fork is the fork of last philosopher
 		else
 				program->philo[i].right_fork = &program->forks[i - 1]; // right fork is the fork of previous philosopher

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philos.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:47:09 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/03 15:56:18 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/05 20:06:31 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ typedef struct s_rules
 	int				philos_n; // number of philosophers and forks
 	int				meals_limit; // number of times philo has eaten - null by default
 	int				ttt; // could use this to manage the philosopher routine?
-	int				ttd; // time limit a philo can stay without eating, if surpassed philo dies and simulation stops
+	size_t				ttd; // time limit a philo can stay without eating, if surpassed philo dies and simulation stops
 	int				tte; // time it takes for each philo to eat
 	int				tts; // time it takes for each philo to sleep
 	bool			found_dead; // flag for checking if a philo has died and stops the simulation
@@ -89,7 +89,7 @@ bool init_philos(t_data *program);
 bool	start_simulation(t_data *program, t_philos *philo); // starts threads
 void	*routine(void *arg); // starts the routine of each philosopher
 void	thinks(t_philos *philo); // action
-void	eats(t_philos *philo); // action
+void	eats(t_philos *philo, pthread_mutex_t *first_fork, pthread_mutex_t *previous_fork);
 void	sleeps(t_philos *philo); // action
 void	dies(t_philos *philo); // action
 

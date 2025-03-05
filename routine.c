@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/01/09 15:44:38 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/05 20:05:41 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,38 +38,49 @@
 
 void	thinks(t_philos *philo)
 {
-	philo->curr_t = get_unix_timestamp() - philo->tob;
-	philo->status.is_eating = 0;
-	// philo->status.is_sleeping = 0;
 	printf("💭 %zu philo[%d] is thinking\n", philo->curr_t, philo->id);
-	// usleep(500000); //to simulate time duration
+	usleep(philo->args.ttt * 1000); // sleeps for time to think len
 	// goes to eat
 }
-void	eats(t_philos *philo)
+void	eats(t_philos *philo, pthread_mutex_t *first_fork, pthread_mutex_t *second_fork)
 {
-	//takes left fork - phtread_mutex_lock (philo->left_fork)
-	//takes right fork - phtread_mutex_lock (philo->right_fork)
-	philo->meal_start = get_unix_timestamp() - philo->tob;
-	philo->status.is_eating = 1;
-	philo->status.is_sleeping = 0;
-	printf("🍔 %zu philo[%d] started eating\n", philo->meal_start, philo->id);
-	//takes left fork - phtread_mutex_unlock (philo->left_fork)
-	//takes right fork - phtread_mutex_unlock (philo->right_fork)
-	// philo->meals_n++;
-	// usleep(philo->args.tte * 1000); //to simulate time duration
-	// philo->meal_end = get_unix_timestamp() - philo->tob;
-	// printf("🍽️ %zu philo[%d] ended eating\n", philo->meal_end, philo->id);
-	// goes to sleep
+	if(!philo->status.is_eating)
+	{
+		pthread_mutex_lock(first_fork); // right for even left for odd
+		printf("%zu %d has taken a fork\n", get_curr_ms(philo->args.unix_start), philo->id);
+		pthread_mutex_lock(second_fork); // left for even right for odd
+		printf("%zu %d has taken a fork\n", get_curr_ms(philo->args.unix_start), philo->id);
+		philo->status.is_eating = true;
+	}
+	if(philo->status.is_eating)
+	{
+		philo->meal_start = get_curr_ms(philo->args.unix_start);
+		printf("%zu %d is eating\n", philo->meal_start, philo->id);
+		usleep(philo->args.tte * 1000);
+		philo->meal_end = get_curr_ms(philo->args.unix_start);
+		// Release forks
+		printf("%zu %d put down a fork\n", get_curr_ms(philo->args.unix_start), philo->id);
+		pthread_mutex_unlock(philo->right_fork);
+		// printf("%zu %d has put down RIGHT fork i:%d\n", get_curr_ms(philo->args.unix_start), philo->id, philo->rf_id);
+		printf("%zu %d put down a fork\n", get_curr_ms(philo->args.unix_start), philo->id);
+		pthread_mutex_unlock(philo->left_fork);
+		philo->meals_n++; // increase the meal in case optional requirement given
+		philo->status.is_eating = false;
+	}
+	if (philo->meal_end - philo->meal_start >= philo->args.ttd) // this has no sense
+	{
+		printf("%zu %d is dead 💀\n", philo->meal_end, philo->id);
+		philo->status.is_alive = false;
+		// should already break
+	}
 }
 void	sleeps(t_philos *philo)
 {
-	//put down left fork - release mutex
-	//put down right fork - release mutex
 	philo->curr_t = get_unix_timestamp() - philo->tob;
-	philo->status.is_thinking = 0;
-	// philo->status.is_eating = 0;
-	printf("🌙 %zu philo[%d] is sleeping\n", philo->curr_t, philo->id);
-	// usleep(philo->args.tts); //to simulate time duration
+	printf("🌙 %zu %d is sleeping\n", philo->curr_t, philo->id);
+	philo->status.is_sleeping = true;
+	usleep(philo->args.tts * 1000); //to simulate time duration
+	philo->status.is_sleeping = false;
 	// goes to think
 }
 
