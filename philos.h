@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:47:09 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/06 12:55:38 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/06 19:16:28 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ typedef struct s_rules
 	int				tte; // time it takes for each philo to eat
 	int				tts; // time it takes for each philo to sleep
 	bool			found_dead; // flag for checking if a philo has died and stops the simulation
+	pthread_mutex_t	dead_lock; // mutex teo lock the found_dead flag
 	long			unix_start;
 }	t_rules;
 
@@ -57,7 +58,7 @@ typedef struct s_philos // struct for each philosopher
 	size_t			meal_end; // timestamp to check last meal and if exceeding ttd philo has to die
 	pthread_mutex_t	*left_fork; // left fork
 	pthread_mutex_t	*right_fork; // right fork
-	t_rules				args; // struct to store the arguments
+	t_rules				*args; // pointer to args struct (which modifies the data args of the program)
 	// pthread_mutex_t *next_fork; // left of left fork -- curious if this can help more later
 } t_philos;
 

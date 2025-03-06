@@ -6,39 +6,40 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/06 12:53:44 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/06 19:16:26 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philos.h"
 
+bool	dead_check(t_philos *philo)
+{
+	pthread_mutex_lock(&philo->args->dead_lock);
+	if (philo->args->found_dead)
+	{
+		printf("found dead %d\n", philo->args->found_dead);
+		return (pthread_mutex_lock(&philo->args->dead_lock), 1);
+	}
+	pthread_mutex_lock(&philo->args->dead_lock);
+	return (0);
+}
+
 void *routine(void *arg)
 {
 	t_philos *philo = (t_philos *)arg;
 
-	philo->status.is_alive = true;
-	philo->status.is_sleeping = false;
-	philo->status.is_eating = false;
-	philo->status.is_thinking = false;
-	// philo->status.is_full = false;
-	philo->tob = get_curr_ms(philo->args.unix_start); // Start timestamp
-	while (philo->status.is_alive) // Infinite loop until death
+	while (philo->status.is_alive && philo->args->found_dead == false) // Infinite loop until death
 	{
-		// Thinking state
 		if (philo->id % 2 == 0)
 			eats(philo, philo->right_fork, philo->left_fork); // even takes right first and left second
 		else
 			eats(philo, philo->left_fork, philo->right_fork); // odd takes left first and right second
-		// if(philo)
-		sleeps(philo);
-		thinks(philo);
-		if (!philo->status.is_alive)
+		if(philo->status.is_alive && philo->args->found_dead == false)
 		{
-			break;
-			/* code */
+			sleeps(philo);
+			thinks(philo);
 		}
 	}
-
 	return NULL;
 }
 
@@ -49,21 +50,41 @@ bool	start_simulation(t_data *program, t_philos *philo)
 
 	i = 0;
 	(void)philo;
-	while (i < program->args.philos_n)
+	while (i < program->args.philos_n && program->args.found_dead == false)
 	{
 		if(pthread_create(&program->philo[i].lifespan, NULL, &routine, &program->philo[i]) != 0)
 		{
 			printf("Error: failed to create thread\n"); // should I also destroy all threads and mutexes here?
 			return (false);
 		}
+		// printf("found dead %d\n", program->args.found_dead);
 		i++;
 	}
+	// printf("wei\n");
 	i = 0;
-	while (i < program->args.philos_n)
+	while (1)
 	{
-		pthread_join(program->philo[i].lifespan, NULL);// <- stops threads from running -.-''
-		i++;
+		pthread_mutex_lock(&program->args.dead_lock);
+		if (program->args.found_dead)
+		{
+			// printf("found dead %d\n", program->args.found_dead);
+			while (i < program->args.philos_n)
+			{
+				// printf("joining thread %d\n", i);
+				pthread_join(program->philo[i].lifespan, NULL);// <- stops threads from running -.-''
+				i++;
+			}
+			pthread_mutex_unlock(&program->args.dead_lock);
+			break;
+		}
+		pthread_mutex_unlock(&program->args.dead_lock);
+		// usleep(1000);  // Small delay to avoid excessive CPU usage
 	}
+	// while (i < program->args.philos_n)
+	// {
+	// 	pthread_join(program->philo[i].lifespan, NULL);// <- stops threads from running -.-''
+	// 	i++;
+	// }
 	return(true);
 }
 
@@ -81,14 +102,17 @@ bool	init_philos(t_data *program)
 	while(i < program->args.philos_n)
 	{
 		program->philo[i].id = i + 1;
-		program->philo[i].args = program->args;
-		// program->philo[i].tob = get_unix_timestamp();
+		program->philo[i].args = &program->args;
 		program->philo[i].meals_n = 0;
 		program->philo[i].left_fork = &program->forks[i]; // left fork for philo_n 0 (1) it's fork 0 (1)
 		if (i == 0)// if total philos if 50, the r_f of philo 1 (0 i) is the l_f of philo 50 (49 i so philo_n - 1)
 				program->philo[i].right_fork = &program->forks[program->args.philos_n - 1 ]; // right fork is the fork of last philosopher
 		else
 				program->philo[i].right_fork = &program->forks[i - 1]; // right fork is the fork of previous philosopher
+		program->philo[i].status.is_alive = true;
+		program->philo[i].status.is_sleeping = false;
+		program->philo[i].status.is_eating = false;
+		program->philo[i].status.is_thinking = false;
 		i++;
 	}
 	return (true);
@@ -137,6 +161,8 @@ bool	init_data(int argc, char **argv, t_data *program, t_rules *args)
 	args->ttd = ft_atoi(argv[2]); // check if more convenient to convert everything into microseconds and then use usleep with t/1000 to show milliseconds
 	args->tte = ft_atoi(argv[3]);
 	args->tts = ft_atoi(argv[4]);
+	args->found_dead = false;
+	pthread_mutex_init(&args->dead_lock, NULL); // <-- Initialize mutex
 	args->unix_start = get_unix_timestamp(); // ms since 1970 to start of program, does not need conversion (it's in milliseconds)
 	if (argc == 6)
 	{
