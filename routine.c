@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   routine.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/05 20:05:41 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/06 12:55:15 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@
 
 void	thinks(t_philos *philo)
 {
-	printf("💭 %zu philo[%d] is thinking\n", philo->curr_t, philo->id);
+	printf("%zu %d is thinking\n", get_curr_ms(philo->args.unix_start), philo->id);
 	usleep(philo->args.ttt * 1000); // sleeps for time to think len
 	// goes to eat
 }
@@ -59,10 +59,10 @@ void	eats(t_philos *philo, pthread_mutex_t *first_fork, pthread_mutex_t *second_
 		usleep(philo->args.tte * 1000);
 		philo->meal_end = get_curr_ms(philo->args.unix_start);
 		// Release forks
-		printf("%zu %d put down a fork\n", get_curr_ms(philo->args.unix_start), philo->id);
+		// printf("%zu %d put down a fork\n", get_curr_ms(philo->args.unix_start), philo->id);
 		pthread_mutex_unlock(philo->right_fork);
 		// printf("%zu %d has put down RIGHT fork i:%d\n", get_curr_ms(philo->args.unix_start), philo->id, philo->rf_id);
-		printf("%zu %d put down a fork\n", get_curr_ms(philo->args.unix_start), philo->id);
+		// printf("%zu %d put down a fork\n", get_curr_ms(philo->args.unix_start), philo->id);
 		pthread_mutex_unlock(philo->left_fork);
 		philo->meals_n++; // increase the meal in case optional requirement given
 		philo->status.is_eating = false;
@@ -76,8 +76,7 @@ void	eats(t_philos *philo, pthread_mutex_t *first_fork, pthread_mutex_t *second_
 }
 void	sleeps(t_philos *philo)
 {
-	philo->curr_t = get_unix_timestamp() - philo->tob;
-	printf("🌙 %zu %d is sleeping\n", philo->curr_t, philo->id);
+	printf("%zu %d is sleeping\n", get_curr_ms(philo->args.unix_start), philo->id);
 	philo->status.is_sleeping = true;
 	usleep(philo->args.tts * 1000); //to simulate time duration
 	philo->status.is_sleeping = false;
@@ -87,7 +86,7 @@ void	sleeps(t_philos *philo)
 void	dies(t_philos *philo) // pilospher should avoid dying
 {
 	// if(meal_end - meal_start > ttd)
-	printf("%zu philo[%d] is dead 💀\n", get_unix_timestamp() - philo->tob, philo->id);
+	printf("%zu %d is dead 💀\n", get_unix_timestamp() - philo->tob, philo->id);
 	//message should be displayed no more than 10 ms after the actual death of the philosopher.
 }
 
