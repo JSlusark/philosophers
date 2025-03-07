@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   routine.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/06 19:16:29 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/07 12:37:32 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,8 +63,8 @@ void	eats(t_philos *philo, pthread_mutex_t *first_fork, pthread_mutex_t *second_
 		philo->meal_end = get_curr_ms(philo->args->unix_start);
 		philo->meals_n++; // increase the meal in case optional requirement given
 		philo->status.is_eating = false;
-		pthread_mutex_unlock(philo->right_fork);
-		pthread_mutex_unlock(philo->left_fork);
+		pthread_mutex_unlock(first_fork);
+		pthread_mutex_unlock(second_fork);
 	}
 	if (philo->meal_end - philo->meal_start >= philo->args->ttd) // this has no sense
 	{
