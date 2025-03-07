@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/07 12:37:32 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/07 12:52:15 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@
 
 void	thinks(t_philos *philo)
 {
-	printf("%zu %d is thinking\n", get_curr_ms(philo->args->unix_start), philo->id);
+	printf(THINK"%zu %d is thinking\n" RESET, get_curr_ms(philo->args->unix_start), philo->id);
 	usleep(philo->args->ttt * 1000); // sleeps for time to think len
 	// goes to eat
 }
@@ -49,10 +49,10 @@ void	eats(t_philos *philo, pthread_mutex_t *first_fork, pthread_mutex_t *second_
 		// printf("EATS found dead %d\n", philo->args->found_dead);
 		pthread_mutex_lock(first_fork); // right for even left for odd
 		if(!philo->status.is_eating && philo->args->found_dead == false)
-			printf("%zu %d has taken a fork\n", get_curr_ms(philo->args->unix_start), philo->id);
+			printf(FORK1"%zu %d has taken a fork\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
 		pthread_mutex_lock(second_fork); // left for even right for odd
 		if(!philo->status.is_eating && philo->args->found_dead == false)
-			printf("%zu %d has taken a fork\n", get_curr_ms(philo->args->unix_start), philo->id);
+			printf(FORK2"%zu %d has taken a fork\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
 		philo->status.is_eating = true;
 	}
 	if(philo->status.is_eating && philo->args->found_dead == false)
@@ -68,24 +68,16 @@ void	eats(t_philos *philo, pthread_mutex_t *first_fork, pthread_mutex_t *second_
 	}
 	if (philo->meal_end - philo->meal_start >= philo->args->ttd) // this has no sense
 	{
-		printf("%zu %d is dead 💀\n", philo->meal_end, philo->id);
+		printf(DEATH"%zu %d died\n"RESET, philo->meal_end, philo->id);
 		philo->status.is_alive = false;
 		philo->args->found_dead = true;
 	}
 }
 void	sleeps(t_philos *philo)
 {
-	printf("%zu %d is sleeping\n", get_curr_ms(philo->args->unix_start), philo->id);
+	printf(SLEEP"%zu %d is sleeping\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
 	philo->status.is_sleeping = true;
 	usleep(philo->args->tts * 1000); //to simulate time duration
 	philo->status.is_sleeping = false;
 	// goes to think
 }
-
-void	dies(t_philos *philo) // pilospher should avoid dying
-{
-	// if(meal_end - meal_start > ttd)
-	printf("%zu %d is dead 💀\n", get_unix_timestamp() - philo->tob, philo->id);
-	//message should be displayed no more than 10 ms after the actual death of the philosopher.
-}
-

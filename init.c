@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/06 19:16:26 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/07 12:57:50 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,18 +28,22 @@ void *routine(void *arg)
 {
 	t_philos *philo = (t_philos *)arg;
 
-	while (philo->status.is_alive && philo->args->found_dead == false) // Infinite loop until death
+	while (philo->args->found_dead == false) // Infinite loop until death
 	{
 		if (philo->id % 2 == 0)
-			eats(philo, philo->right_fork, philo->left_fork); // even takes right first and left second
+		eats(philo, philo->right_fork, philo->left_fork); // even takes right first and left second
 		else
-			eats(philo, philo->left_fork, philo->right_fork); // odd takes left first and right second
+		eats(philo, philo->left_fork, philo->right_fork); // odd takes left first and right second
+		// printf("------------ philo found dead %i\n", philo->args->found_dead);
 		if(philo->status.is_alive && philo->args->found_dead == false)
 		{
 			sleeps(philo);
 			thinks(philo);
 		}
+		else
+			break;
 	}
+	// printf("philo end\n");
 	return NULL;
 }
 
@@ -57,34 +61,14 @@ bool	start_simulation(t_data *program, t_philos *philo)
 			printf("Error: failed to create thread\n"); // should I also destroy all threads and mutexes here?
 			return (false);
 		}
-		// printf("found dead %d\n", program->args.found_dead);
 		i++;
 	}
-	// printf("wei\n");
 	i = 0;
-	while (1)
+	while (i < program->args.philos_n)
 	{
-		pthread_mutex_lock(&program->args.dead_lock);
-		if (program->args.found_dead)
-		{
-			// printf("found dead %d\n", program->args.found_dead);
-			while (i < program->args.philos_n)
-			{
-				// printf("joining thread %d\n", i);
-				pthread_join(program->philo[i].lifespan, NULL);// <- stops threads from running -.-''
-				i++;
-			}
-			pthread_mutex_unlock(&program->args.dead_lock);
-			break;
-		}
-		pthread_mutex_unlock(&program->args.dead_lock);
-		// usleep(1000);  // Small delay to avoid excessive CPU usage
+		pthread_join(program->philo[i].lifespan, NULL);// <- stops threads from running -.-''
+		i++;
 	}
-	// while (i < program->args.philos_n)
-	// {
-	// 	pthread_join(program->philo[i].lifespan, NULL);// <- stops threads from running -.-''
-	// 	i++;
-	// }
 	return(true);
 }
 

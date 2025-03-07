@@ -3,15 +3,25 @@
 /*                                                        :::      ::::::::   */
 /*   philos.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:47:09 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/06 19:16:28 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/07 12:50:43 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILOS_H
 # define PHILOS_H
+
+
+#define RESET "\033[0m"
+#define DEATH "\033[31m"   // Red for death
+#define SLEEP "\033[34m"   // Blue for sleep
+#define THINK "\033[35m"   // Purple for thinking
+#define FORK1 "\033[33m"   // Yellow for fork 1
+#define FORK2 "\033[38;5;214m" // Orange for fork 2 (uses extended ANSI)
+#define MESS1 "\033[32m"    // Green for highlight 1
+#define MESS2 "\033[33m"    // Yellow for highlight 2
 
 #include <string.h>     // memset
 #include <stdio.h>      // printf
