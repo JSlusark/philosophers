@@ -6,43 +6,64 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/07 12:57:50 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/07 15:08:41 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philos.h"
 
-bool	dead_check(t_philos *philo)
+// bool	dead_check(t_philos *philo)
+// {
+// 	pthread_mutex_lock(&philo->args->dead_lock);
+// 	if (philo->args->found_dead)
+// 	{
+// 		printf("found dead %d\n", philo->args->found_dead);
+// 		return (pthread_mutex_lock(&philo->args->dead_lock), 1);
+// 	}
+// 	pthread_mutex_lock(&philo->args->dead_lock);
+// 	return (0);
+// }
+
+bool	check_time(t_philos *philo)
 {
 	pthread_mutex_lock(&philo->args->dead_lock);
-	if (philo->args->found_dead)
+	if(philo->args->found_dead)
 	{
-		printf("found dead %d\n", philo->args->found_dead);
-		return (pthread_mutex_lock(&philo->args->dead_lock), 1);
+		return(false);
 	}
-	pthread_mutex_lock(&philo->args->dead_lock);
-	return (0);
+	pthread_mutex_unlock(&philo->args->dead_lock);
+	return(true);
 }
 
 void *routine(void *arg)
 {
 	t_philos *philo = (t_philos *)arg;
+	philo->tob = get_curr_ms(philo->args->unix_start);
+	philo->stop_timer = 0;
+	printf(GREEN"philo %d born at %zu\n"RESET, philo->id, philo->tob);
+	printf(YELLOW"philo %d current time %zu\n"RESET, philo->id, philo->stop_timer);
 
+	// while (check_time(philo)) // Infinite loop until death
 	while (philo->args->found_dead == false) // Infinite loop until death
 	{
+		printf("------------> 1. philo %d is dead? %i flag found dead %i\n",philo->id, philo->args->found_dead, philo->args->found_dead);
 		if (philo->id % 2 == 0)
 		eats(philo, philo->right_fork, philo->left_fork); // even takes right first and left second
 		else
 		eats(philo, philo->left_fork, philo->right_fork); // odd takes left first and right second
-		// printf("------------ philo found dead %i\n", philo->args->found_dead);
-		if(philo->status.is_alive && philo->args->found_dead == false)
-		{
+		printf("------------> 2. philo %d is dead? %i flag found dead %i\n",philo->id, philo->args->found_dead, philo->args->found_dead);
+		if(philo->args->found_dead == false)
 			sleeps(philo);
+		if(philo->args->found_dead == false)
 			thinks(philo);
-		}
-		else
+		printf("------------> 3. philo %d is dead? %i flag found dead %i\n",philo->id, philo->args->found_dead, philo->args->found_dead);
+		if(philo->args->found_dead == true)
 			break;
+		// else
+		// 	break;
 	}
+	pthread_mutex_unlock(philo->left_fork);
+	pthread_mutex_unlock(philo->right_fork);
 	// printf("philo end\n");
 	return NULL;
 }

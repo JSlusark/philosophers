@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:47:09 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/07 12:50:43 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/07 14:56:48 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@
 #define THINK "\033[35m"   // Purple for thinking
 #define FORK1 "\033[33m"   // Yellow for fork 1
 #define FORK2 "\033[38;5;214m" // Orange for fork 2 (uses extended ANSI)
-#define MESS1 "\033[32m"    // Green for highlight 1
-#define MESS2 "\033[33m"    // Yellow for highlight 2
+#define GREEN "\033[32m"    // Green for highlight 1
+#define YELLOW "\033[33m"    // Yellow for highlight 2
 
 #include <string.h>     // memset
 #include <stdio.h>      // printf
@@ -60,7 +60,7 @@ typedef struct s_philos // struct for each philosopher
 	int				id; // index of philosopher in struct array, can be useful with phtread_join/pthread_detach
 	pthread_t		lifespan; // thread of each philosopher's lifespan
 	size_t			tob; // time of birth timestamp
-	size_t			curr_t; // start of action timestamp
+	size_t			stop_timer; // start of action timestamp
 	t_props			status; // struct to manage the status of each philosopher
 	int				meals_n; // number of times philo has eaten - null by default
 	size_t			meal_wait; // counter to see if philo has eaten before ttd
