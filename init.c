@@ -6,57 +6,51 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/07 15:41:03 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/07 18:13:26 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philos.h"
 
-// bool	dead_check(t_philos *philo)
-// {
-// 	pthread_mutex_lock(&philo->args->dead_lock);
-// 	if (philo->args->found_dead)
-// 	{
-// 		printf("found dead %d\n", philo->args->found_dead);
-// 		return (pthread_mutex_lock(&philo->args->dead_lock), 1);
-// 	}
-// 	pthread_mutex_lock(&philo->args->dead_lock);
-// 	return (0);
-// }
-
-bool	check_time(t_philos *philo)
+int	dead_loop(t_philos *philo)
 {
 	pthread_mutex_lock(&philo->args->dead_lock);
-	if(philo->args->found_dead)
+	if ((philo->activity_end - philo->activity_start) >= philo->args->ttd)
 	{
-		return(false);
+		printf(DEATH"PRINT DEATH!!!!!\n"RESET);
+		return (pthread_mutex_unlock(&philo->args->dead_lock), 1);
 	}
 	pthread_mutex_unlock(&philo->args->dead_lock);
-	return(true);
+	return (0);
 }
-
 void *routine(void *arg)
 {
 	t_philos *philo = (t_philos *)arg;
 	philo->tob = get_curr_ms(philo->args->unix_start);
-	philo->stop_timer = 0;
+	// philo->stop_timer = 0;
+	philo->activity_start = get_curr_ms(philo->args->unix_start);
 	// printf(GREEN"philo %d born at %zu\n"RESET, philo->id, philo->tob);
 	// printf(YELLOW"philo %d current time %zu\n"RESET, philo->id, philo->stop_timer);
 
 	// while (check_time(philo)) // Infinite loop until death
+	// while (!dead_loop(philo)) // Infinite loop until death
 	while (philo->args->found_dead == false) // Infinite loop until death
 	{
-		printf("------------> 1. philo %d is dead? %i flag found dead %i\n",philo->id, philo->args->found_dead, philo->args->found_dead);
+		philo->activity_start = get_curr_ms(philo->args->unix_start); // philo sleeps pnly when full therefore we restart the cycle
+		// printf("------------> 1. philo %d is dead? %i flag found dead %i\n",philo->id, philo->args->found_dead, philo->args->found_dead);
 		if (philo->id % 2 == 0)
-		eats(philo, philo->right_fork, philo->left_fork); // even takes right first and left second
+		{
+			usleep(500);
+			eats(philo, philo->right_fork, philo->left_fork); // even takes right first and left second
+		}
 		else
-		eats(philo, philo->left_fork, philo->right_fork); // odd takes left first and right second
-		printf("------------> 2. philo %d is dead? %i flag found dead %i\n",philo->id, philo->args->found_dead, philo->args->found_dead);
-		if(philo->args->found_dead == false)
+			eats(philo, philo->left_fork, philo->right_fork); // odd takes left first and right second
+		// printf("------------> 2. philo %d is dead? %i flag found dead %i\n",philo->id, philo->args->found_dead, philo->args->found_dead);
+		if(philo->args->found_dead == false && !philo->status.is_eating)
 			sleeps(philo);
-		if(philo->args->found_dead == false)
+		if(philo->args->found_dead == false && !philo->status.is_eating)
 			thinks(philo);
-		printf("------------> 3. philo %d is dead? %i flag found dead %i\n",philo->id, philo->args->found_dead, philo->args->found_dead);
+		// printf("------------> 3. philo %d is dead? %i flag found dead %i\n",philo->id, philo->args->found_dead, philo->args->found_dead);
 		if(philo->args->found_dead == true)
 			break;
 		// else
@@ -118,6 +112,7 @@ bool	init_philos(t_data *program)
 		program->philo[i].status.is_sleeping = false;
 		program->philo[i].status.is_eating = false;
 		program->philo[i].status.is_thinking = false;
+		program->philo[i].status.ate = false;
 		i++;
 	}
 	return (true);

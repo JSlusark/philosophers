@@ -6,11 +6,31 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/07 15:56:51 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/07 18:41:28 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philos.h"
+
+// void	ft_usleep(size_t milliseconds, t_philos *philo)
+// {
+// 	size_t	start_time;
+
+// 	start_time = get_curr_ms(philo->args->unix_start);
+// 	while ((get_curr_ms(philo->args->unix_start) - start_time) < milliseconds)
+// 	{
+// 		// Check for death AFTER sleep
+// 		// if ((get_curr_ms(philo->args->unix_start) - philo->activity_start) >= philo->args->ttd)
+// 		// {
+// 		// 	printf(DEATH"%zu %d died AFTER SLEEP\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
+// 		// 	philo->status.is_alive = false;
+// 		// 	philo->args->found_dead = true;
+// 		// 	return;
+// 		// }
+// 		usleep(500); // Small sleep to avoid CPU overuse
+// 	}
+// }
+
 /*
 	order of philo actions:
 	1. philo starts thinking
@@ -38,71 +58,79 @@
 
 void	thinks(t_philos *philo)
 {
-	pthread_mutex_lock(&philo->args->think_lock);
-	printf(THINK"%zu %d is thinking\n" RESET, get_curr_ms(philo->args->unix_start), philo->id);
-	// usleep(philo->args->ttt * 1000); // sleeps for time to think len
-	philo->stop_timer = get_curr_ms(philo->args->unix_start);
-	if (philo->stop_timer >= philo->args->ttd)
+	// pthread_mutex_lock(&philo->args->think_lock);
+	// if(philo->status.ate)
+		// philo->activity_start = get_curr_ms(philo->args->unix_start);
+	printf(THINK"%zu %d is thinking - START %zu\n" RESET, get_curr_ms(philo->args->unix_start), philo->id, philo->activity_start);
+	philo->activity_end = get_curr_ms(philo->args->unix_start);
+	if ((philo->activity_end - philo->activity_start) >= philo->args->ttd)
 	{
-		printf(DEATH"%zu %d died IN THINKS\n"RESET, philo->stop_timer, philo->id);
+		printf(DEATH"%zu %d died AFETR THINKS\n"RESET, philo->activity_end, philo->id);
 		philo->status.is_alive = false;
 		philo->args->found_dead = true;
 		pthread_mutex_unlock(&philo->args->think_lock);
 	}
-	pthread_mutex_unlock(&philo->args->think_lock);
-	// goes to eat
+	// pthread_mutex_unlock(&philo->args->think_lock);
+
 }
 void	eats(t_philos *philo, pthread_mutex_t *first_fork, pthread_mutex_t *second_fork)
 {
-	if(!philo->status.is_eating && philo->args->found_dead == false)
+	if (!philo->status.is_eating && philo->args->found_dead == false)
 	{
-		// printf("EATS found dead %d\n", philo->args->found_dead);
-		pthread_mutex_lock(first_fork); // right for even left for odd
-		if(!philo->status.is_eating && philo->args->found_dead == false)
-			printf(FORK1"%zu %d has taken a fork\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
+		pthread_mutex_lock(first_fork);
+		philo->status.is_eating = true;
+		printf(FORK1"%zu %d has taken a fork\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
 		pthread_mutex_lock(second_fork); // left for even right for odd
-		if(!philo->status.is_eating && philo->args->found_dead == false)
-			printf(FORK2"%zu %d has taken a fork\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
-		philo->meal_start = get_curr_ms(philo->args->unix_start);
-		printf("%zu %d is eating\n", get_curr_ms(philo->args->unix_start), philo->id);
+		// if(!philo->status.is_eating && philo->args->found_dead == false)
+		printf(FORK2"%zu %d has taken a fork\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
+
+		// THIS SHOULD BE FILLED IF PHILO WAS PREVIOUSLY FED??? <<<<<<<<<<---------------------------- IDK anymore :(((())))
+		// if(!philo->status.ate)
+		// 	philo->activity_start = get_curr_ms(philo->args->unix_start);
+		if(philo->activity_start != get_curr_ms(philo->args->unix_start))
+			philo->activity_start = get_curr_ms(philo->args->unix_start);
+		printf("%zu %d is eating\n", philo->activity_start, philo->id);
 		usleep(philo->args->tte * 1000);
-		printf("%zu %d finished eating\n", get_curr_ms(philo->args->unix_start), philo->id);
-		// philo->meal_end = get_curr_ms(philo->args->unix_start);
-		philo->stop_timer = get_curr_ms(philo->args->unix_start);
-		philo->meals_n++; // increase the meal in case optional requirement given
+		philo->activity_end = get_curr_ms(philo->args->unix_start);
+		printf("%zu %d finished eating START: %zu\n", philo->activity_end, philo->id, philo->activity_start);
 		philo->status.is_eating = false;
-		printf(FORK1"%zu %d put down 1st a fork\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
-		pthread_mutex_unlock(first_fork);
-		printf(FORK2"%zu %d put down 2nd a fork\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
-		pthread_mutex_unlock(second_fork);
-		if ((philo->stop_timer - philo->meal_start )>= philo->args->ttd)
-		{
-			printf(DEATH"%zu %d died IN EATS\n"RESET, philo->stop_timer, philo->id);
-			philo->status.is_alive = false;
-			philo->args->found_dead = true;
-		}
-		else
-			philo->stop_timer = 0; // resta
+		// printf(GREEN"%d EAT DIFF:%zu \n"RESET, philo->id, philo->activity_end - philo->activity_start);
 	}
+	// pthread_mutex_lock(&philo->args->dead_lock);
+	if ((philo->activity_end - philo->activity_start) >= philo->args->ttd)
+	{
+		printf(DEATH"%zu %d died AFTER EATING\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
+		philo->status.is_alive = false;
+		philo->args->found_dead = true;
+		pthread_mutex_unlock(first_fork);
+		pthread_mutex_unlock(second_fork);
+	}
+	else
+	{
+		printf(GREEN"%zu %d SURVIVED EAT DIFF:%zu\n"RESET, get_curr_ms(philo->args->unix_start), philo->id, philo->activity_end - philo->activity_start);
+		philo->activity_start = get_curr_ms(philo->args->unix_start);
+		philo->status.ate = true;
+	}
+	// pthread_mutex_unlock(&philo->args->dead_lock);
+	// // Check if the philosopher dies after eating
 	pthread_mutex_unlock(first_fork);
 	pthread_mutex_unlock(second_fork);
 }
+
 void	sleeps(t_philos *philo)
 {
 	pthread_mutex_lock(&philo->args->sleep_lock);
-	printf(SLEEP"%zu %d is sleeping\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
-	philo->status.is_sleeping = true;
-	usleep(philo->args->tts * 1000); //to simulate time duration	philo->stop_timer = get_curr_ms(philo->args->unix_start);
-	philo->stop_timer = get_curr_ms(philo->args->unix_start);
-	philo->status.is_sleeping = false;
-	if (philo->stop_timer >= philo->args->ttd)
+	printf(SLEEP"%zu %d is sleeping START %zu\n"RESET, get_curr_ms(philo->args->unix_start), philo->id, philo->activity_start);
+
+	// Use the new `usleep()` to check for death
+	usleep(philo->args->tts * 1000);
+	philo->activity_end = get_curr_ms(philo->args->unix_start);
+	if ((philo->activity_end - philo->activity_start) >= philo->args->ttd)
 	{
-		printf(DEATH"%zu %d died IN SLEEPS\n"RESET, philo->stop_timer, philo->id);
+		printf(DEATH"%zu %d died AFTER SLEEP\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
 		philo->status.is_alive = false;
 		philo->args->found_dead = true;
-		pthread_mutex_unlock(&philo->args->sleep_lock);
 	}
+	philo->status.ate = false;
 	pthread_mutex_unlock(&philo->args->sleep_lock);
-
-	// goes to think
 }

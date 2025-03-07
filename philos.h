@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:47:09 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/07 15:13:27 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/07 18:24:09 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,10 +35,10 @@ typedef struct s_rules
 {
 	int				philos_n; // number of philosophers and forks
 	int				meals_limit; // number of times philo has eaten - null by default
-	int				ttt; // could use this to manage the philosopher routine?
+	size_t				ttt; // could use this to manage the philosopher routine?
 	size_t				ttd; // time limit a philo can stay without eating, if surpassed philo dies and simulation stops
-	int				tte; // time it takes for each philo to eat
-	int				tts; // time it takes for each philo to sleep
+	size_t				tte; // time it takes for each philo to eat
+	size_t				tts; // time it takes for each philo to sleep
 	bool			found_dead; // flag for checking if a philo has died and stops the simulation
 	pthread_mutex_t	dead_lock; // mutex teo lock the found_dead flag
 	pthread_mutex_t	meal_lock; // mutex teo lock the found_dead flag
@@ -50,6 +50,7 @@ typedef struct s_rules
 typedef struct s_props // not assigning as null by default
 {
 	bool is_born;
+	bool ate;
 	bool is_alive;
 	bool is_thinking;
 	bool is_eating;
@@ -67,8 +68,8 @@ typedef struct s_philos // struct for each philosopher
 	t_props			status; // struct to manage the status of each philosopher
 	int				meals_n; // number of times philo has eaten - null by default
 	size_t			meal_wait; // counter to see if philo has eaten before ttd
-	size_t			meal_start; // timestamp of when philo starts eating
-	size_t			meal_end; // timestamp to check last meal and if exceeding ttd philo has to die
+	size_t			activity_start; // timestamp of when philo starts eating
+	size_t			activity_end; // timestamp to check last meal and if exceeding ttd philo has to die
 	pthread_mutex_t	*left_fork; // left fork
 	pthread_mutex_t	*right_fork; // right fork
 	t_rules				*args; // pointer to args struct (which modifies the data args of the program)
