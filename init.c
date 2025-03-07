@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/07 15:08:41 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/07 15:41:03 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,8 @@ void *routine(void *arg)
 	t_philos *philo = (t_philos *)arg;
 	philo->tob = get_curr_ms(philo->args->unix_start);
 	philo->stop_timer = 0;
-	printf(GREEN"philo %d born at %zu\n"RESET, philo->id, philo->tob);
-	printf(YELLOW"philo %d current time %zu\n"RESET, philo->id, philo->stop_timer);
+	// printf(GREEN"philo %d born at %zu\n"RESET, philo->id, philo->tob);
+	// printf(YELLOW"philo %d current time %zu\n"RESET, philo->id, philo->stop_timer);
 
 	// while (check_time(philo)) // Infinite loop until death
 	while (philo->args->found_dead == false) // Infinite loop until death
@@ -168,6 +168,8 @@ bool	init_data(int argc, char **argv, t_data *program, t_rules *args)
 	args->tts = ft_atoi(argv[4]);
 	args->found_dead = false;
 	pthread_mutex_init(&args->dead_lock, NULL); // <-- Initialize mutex
+	pthread_mutex_init(&args->sleep_lock, NULL); // <-- Initialize mutex
+	pthread_mutex_init(&args->think_lock, NULL); // <-- Initialize mutex
 	args->unix_start = get_unix_timestamp(); // ms since 1970 to start of program, does not need conversion (it's in milliseconds)
 	if (argc == 6)
 	{

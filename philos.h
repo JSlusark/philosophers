@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:47:09 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/07 14:56:48 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/07 15:13:27 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,9 @@ typedef struct s_rules
 	int				tts; // time it takes for each philo to sleep
 	bool			found_dead; // flag for checking if a philo has died and stops the simulation
 	pthread_mutex_t	dead_lock; // mutex teo lock the found_dead flag
+	pthread_mutex_t	meal_lock; // mutex teo lock the found_dead flag
+	pthread_mutex_t	think_lock; // mutex teo lock the found_dead flag
+	pthread_mutex_t	sleep_lock; // mutex teo lock the found_dead flag
 	long			unix_start;
 }	t_rules;
 
