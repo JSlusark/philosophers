@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:47:09 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/10 16:37:00 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/10 18:05:04 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,5 +95,6 @@ void	eats(t_philos *philo);
 void	sleeps(t_philos *philo);
 bool	check_death(t_philos *philo);
 void	cleanup(t_data *program);
+void *monitor(void *arg);
 
 #endif

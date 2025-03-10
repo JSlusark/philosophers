@@ -6,13 +6,50 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/10 17:20:52 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/10 18:21:59 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philos.h"
 
-#include "philos.h"
+void *monitor(void *arg)
+{
+	t_data *program = (t_data *)arg;
+	int	i;
+
+	while (true)
+	{
+		// Lock the mutex to check death condition
+		pthread_mutex_lock(&program->args.dead_lock);
+		if (program->args.found_dead)
+		{
+			pthread_mutex_unlock(&program->args.dead_lock);
+			break;
+		}
+		pthread_mutex_unlock(&program->args.dead_lock);
+
+		// Check if all philosophers have eaten enough times
+		if (program->args.meals_limit > 0)
+		{
+			int meals_met = 0;
+			for (i = 0; i < program->args.philos_n; i++)
+			{
+				if (program->philo[i].meals_n >= program->args.meals_limit)
+					meals_met++;
+			}
+			if (meals_met == program->args.philos_n)
+			{
+				pthread_mutex_lock(&program->args.dead_lock);
+				program->args.found_dead = true;
+				pthread_mutex_unlock(&program->args.dead_lock);
+				break;
+			}
+		}
+		usleep(500);
+	}
+	return (NULL);
+}
+
 
 bool check_death(t_philos *philo)
 {
@@ -46,36 +83,55 @@ void *routine(void *arg)
 
 	while (!check_death(philo))
 	{
+		// Check if the simulation should stop
+		pthread_mutex_lock(&philo->args->dead_lock);
+		if (philo->args->found_dead)
+		{
+			pthread_mutex_unlock(&philo->args->dead_lock);
+			break;
+		}
+		pthread_mutex_unlock(&philo->args->dead_lock);
+
 		eats(philo);
 		sleeps(philo);
 		thinks(philo);
 	}
-	return NULL;
+	return (NULL);
 }
 
-bool	start_simulation(t_data *program)
+
+bool start_simulation(t_data *program)
 {
-	// printf("\n - philos_n: %d\n - ttd: %d\n - tte: %d\n - tts: %d\n - meals_limit: %d\n\n", program->args.philos_n, program->args.ttd, program->args.tte, program->args.tts, program->args.meals_limit);
+	pthread_t monitor_thread;
 	int i;
 
-	i = 0;
-	while (i < program->args.philos_n && program->args.found_dead == false)
+	// Create philosopher threads
+	for (i = 0; i < program->args.philos_n; i++)
 	{
-		if(pthread_create(&program->philo[i].lifespan, NULL, &routine, &program->philo[i]) != 0)
+		if (pthread_create(&program->philo[i].lifespan, NULL, &routine, &program->philo[i]) != 0)
 		{
-			printf("Error: failed to create thread\n"); // should I also destroy all threads and mutexes here?
+			printf("Error: failed to create philosopher thread\n");
 			return (false);
 		}
-		i++;
 	}
-	i = 0;
-	while (i < program->args.philos_n)
+
+	// Create monitor thread
+	if (pthread_create(&monitor_thread, NULL, &monitor, program) != 0)
 	{
-		pthread_join(program->philo[i].lifespan, NULL);// <- stops threads from running -.-''
-		i++;
+		printf("Error: failed to create monitor thread\n");
+		return (false);
 	}
-	return(true);
+
+	// Wait for philosophers to finish
+	for (i = 0; i < program->args.philos_n; i++)
+		pthread_join(program->philo[i].lifespan, NULL);
+
+	// Wait for monitor to finish
+	pthread_join(monitor_thread, NULL);
+
+	return (true);
 }
+
 
 bool	init_philos(t_data *program)
 {

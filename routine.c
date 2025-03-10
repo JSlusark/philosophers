@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/10 17:17:01 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/10 18:14:00 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@
  void eats(t_philos *philo)
  {
 	 pthread_mutex_lock(philo->left_fork);
-	 pthread_mutex_lock(philo->right_fork);
+	pthread_mutex_lock(philo->right_fork);
 
 	 pthread_mutex_lock(&philo->args->output_lock);
 	 printf("%zu %d is eating\n", get_curr_ms(philo->args->unix_start), philo->id);
