@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 15:05:39 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/07 15:28:04 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/10 15:27:02 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ size_t get_curr_ms(long start)
 
 long get_unix_timestamp(void) // long is unlikely to overflow as the simiulation will not run indefinitely
 {
-	// builtin struct that stores time in seconds and microseconds
+// builtin struct that stores time in seconds and microseconds
 	//tv_sec: Seconds since January 1, 1970 (the "unix epoch").
 	//tv_usec: Microseconds (one_millionth of a second). 1 second = 1,000,000 microseconds.
 	struct timeval tv;
@@ -50,4 +50,11 @@ int	ft_atoi(const char *nptr)
 		i++;
 	}
 	return (num * sign);
+}
+
+void ft_usleep(size_t milliseconds, t_philos *philo)
+{
+	size_t	start = get_curr_ms(philo->args->unix_start);
+	while ((get_curr_ms(philo->args->unix_start) - start) < milliseconds)
+		usleep(500);
 }
