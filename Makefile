@@ -6,7 +6,7 @@
 #    By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/15 17:49:39 by jjs               #+#    #+#              #
-#    Updated: 2025/03/03 15:10:25 by jslusark         ###   ########.fr        #
+#    Updated: 2025/03/10 12:43:42 by jslusark         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -46,7 +46,7 @@ $(OBJ_DIR)/%.o: %.c
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 #Executable name
-NAME = program
+NAME = philo
 
 # Default target
 all: $(NAME)
@@ -89,6 +89,10 @@ re: fclean all
 
 .PHONY: all clean fclean re %
 
-# Calling helgrind to check for data races
+# Calling to check for data races
+# make helgrind/drd ARGS="4 310 200 200"
 helgrind:
-	@valgrind --tool=helgrind ./$(NAME)
+	@valgrind --tool=helgrind ./$(NAME) $(ARGS)
+
+drd:
+	@valgrind --tool=drd --check-stack-var=yes ./$(NAME) $(ARGS)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   routine.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/07 18:41:28 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/10 12:34:17 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,20 +58,39 @@
 
 void	thinks(t_philos *philo)
 {
-	// pthread_mutex_lock(&philo->args->think_lock);
+	pthread_mutex_lock(&philo->args->think_lock);
 	// if(philo->status.ate)
-		// philo->activity_start = get_curr_ms(philo->args->unix_start);
-	printf(THINK"%zu %d is thinking - START %zu\n" RESET, get_curr_ms(philo->args->unix_start), philo->id, philo->activity_start);
+	philo->activity_start = get_curr_ms(philo->args->unix_start);
+	printf(THINK"%zu %d is thinking - START THINKING %zu\n" RESET, get_curr_ms(philo->args->unix_start), philo->id, philo->activity_start);
 	philo->activity_end = get_curr_ms(philo->args->unix_start);
 	if ((philo->activity_end - philo->activity_start) >= philo->args->ttd)
 	{
-		printf(DEATH"%zu %d died AFETR THINKS\n"RESET, philo->activity_end, philo->id);
+		printf(DEATH"%zu %d died AFTER THINKS\n"RESET, philo->activity_end, philo->id);
 		philo->status.is_alive = false;
 		philo->args->found_dead = true;
 		pthread_mutex_unlock(&philo->args->think_lock);
 	}
-	// pthread_mutex_unlock(&philo->args->think_lock);
+	pthread_mutex_unlock(&philo->args->think_lock);
 
+}
+void	sleeps(t_philos *philo)
+{
+	pthread_mutex_lock(&philo->args->sleep_lock);
+	printf(SLEEP"%zu %d is sleeping START %zu\n"RESET, get_curr_ms(philo->args->unix_start), philo->id, philo->activity_start);
+
+	philo->activity_start = get_curr_ms(philo->args->unix_start);
+	// Use the new `usleep()` to check for death
+	usleep(philo->args->tts * 1000);
+	philo->activity_end = get_curr_ms(philo->args->unix_start);
+	if ((philo->activity_end - philo->activity_start) >= philo->args->ttd)
+	{
+		printf(DEATH"%zu %d died AFTER SLEEP\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
+		philo->status.is_alive = false;
+		philo->args->found_dead = true;
+		pthread_mutex_unlock(&philo->args->sleep_lock);
+	}
+	philo->status.ate = false;
+	pthread_mutex_unlock(&philo->args->sleep_lock);
 }
 void	eats(t_philos *philo, pthread_mutex_t *first_fork, pthread_mutex_t *second_fork)
 {
@@ -117,20 +136,3 @@ void	eats(t_philos *philo, pthread_mutex_t *first_fork, pthread_mutex_t *second_
 	pthread_mutex_unlock(second_fork);
 }
 
-void	sleeps(t_philos *philo)
-{
-	pthread_mutex_lock(&philo->args->sleep_lock);
-	printf(SLEEP"%zu %d is sleeping START %zu\n"RESET, get_curr_ms(philo->args->unix_start), philo->id, philo->activity_start);
-
-	// Use the new `usleep()` to check for death
-	usleep(philo->args->tts * 1000);
-	philo->activity_end = get_curr_ms(philo->args->unix_start);
-	if ((philo->activity_end - philo->activity_start) >= philo->args->ttd)
-	{
-		printf(DEATH"%zu %d died AFTER SLEEP\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
-		philo->status.is_alive = false;
-		philo->args->found_dead = true;
-	}
-	philo->status.ate = false;
-	pthread_mutex_unlock(&philo->args->sleep_lock);
-}

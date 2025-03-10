@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/07 18:13:26 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/10 12:44:31 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void *routine(void *arg)
 		// printf("------------> 1. philo %d is dead? %i flag found dead %i\n",philo->id, philo->args->found_dead, philo->args->found_dead);
 		if (philo->id % 2 == 0)
 		{
-			usleep(500);
+			// usleep(500);
 			eats(philo, philo->right_fork, philo->left_fork); // even takes right first and left second
 		}
 		else
