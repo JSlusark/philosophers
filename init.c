@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/12 16:56:25 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/12 18:05:25 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,12 @@ void *monitor(void *arg)
 			for (i = 0; i < program->args.philos_n; i++)
 			{
 				if (program->philo[i].meals_n >= program->args.meals_limit)
+				{
 					meals_met++;
+					pthread_mutex_lock(&program->args.dead_lock);
+					program->philo[i].status.timer_stopped = get_curr_ms(program->philo[i].args->unix_start) - program->philo[i].last_meal_time;
+					pthread_mutex_unlock(&program->args.dead_lock);
+				}
 			}
 			if (meals_met == program->args.philos_n)
 			{
@@ -66,6 +71,8 @@ bool check_death(t_philos *philo)
 		philo->args->found_dead = true;
 		pthread_mutex_lock(&philo->args->output_lock);
 		printf(DEATH"%zu %d died\n"RESET, current_time, philo->id);
+		philo->status.is_dead = true;
+		philo->status.timer_stopped = current_time - philo->last_meal_time;
 		pthread_mutex_unlock(&philo->args->output_lock);
 		pthread_mutex_unlock(&philo->args->dead_lock);
 		return true;
@@ -129,6 +136,7 @@ bool start_simulation(t_data *program)
 
 	// Wait for monitor to finish
 	pthread_join(monitor_thread, NULL);
+	print_status(program);
 	print_mealcount(program); // debugger for meal count
 
 
@@ -155,6 +163,10 @@ bool	init_philos(t_data *program)
 		program->philo[i].last_meal_time = get_curr_ms(program->args.unix_start);
 		program->philo[i].left_fork = &program->forks[i];
 		program->philo[i].right_fork = &program->forks[(i + 1) % program->args.philos_n];
+		program->philo[i].status.is_eating = false;
+		program->philo[i].status.is_sleeping = false;
+		program->philo[i].status.is_thinking = false;
+		program->philo[i].status.is_dead = false;
 		i++;
 	}
 	return (true);

@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:47:09 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/12 16:55:12 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/12 17:15:50 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,17 +45,16 @@ typedef struct s_rules
 	long			unix_start;
 }	t_rules;
 
-// typedef struct s_props // not assigning as null by default
-// {
-// 	bool is_born;
-// 	bool ate;
-// 	bool is_alive;
-// 	bool is_thinking;
-// 	bool is_eating;
-// 	bool is_sleeping;
-// 	bool is_dead;
-// 	bool is_full;
-// }	t_props;
+typedef struct s_props // not assigning as null by default
+{
+	// bool is_born;
+	// bool ate;
+	bool is_eating;
+	bool is_sleeping;
+	bool is_thinking;
+	bool is_dead;
+	size_t timer_stopped; // time since last meal time until stop of simulation
+}	t_props;
 
 typedef struct s_philos // struct for each philosopher
 {
@@ -66,6 +65,7 @@ typedef struct s_philos // struct for each philosopher
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
 	t_rules			*args; // pointer to args struct (which modifies the data args of the program)
+	t_props			status; // status of the philosopher
 	// pthread_mutex_t *next_fork; // left of left fork -- curious if this can help more later
 } t_philos;
 
@@ -99,6 +99,7 @@ void *monitor(void *arg);
 
 //testing and debugging
 void print_mealcount(t_data *program);
+void print_status(t_data *program);
 
 
 
