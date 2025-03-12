@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/12 12:13:22 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/12 17:55:28 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/12 18:24:48 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ void print_mealcount(t_data *program)
 void print_status(t_data *program)
 {
     printf(GREEN"\nSimulation Parameters:\n"RESET);
+    printf("PHILOSOPHERS: %s%d%s | ", GREEN, program->args.philos_n, RESET);
     printf("TTD: %s%zums%s | ", DEATH, program->args.ttd, RESET);
     printf("TTE: %zums | ", program->args.tte);
     printf("TTS: %zums | ", program->args.tts);
@@ -48,7 +49,7 @@ void print_status(t_data *program)
     {
         t_philos *philo = &program->philo[i];
 
-        printf("[%d] ", philo->id);
+        printf(FORK1"[%d] "RESET, philo->id);
 
         // Eating status
         printf("Eat: %s%s%s | ",
