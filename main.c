@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:46:53 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/12 12:27:05 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/12 12:42:28 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,9 +54,9 @@ int main(int argc, char **argv)
 	(void) philosopher;
 	// remember to add if philos_n is 1 and philos_n is even or odd conditions
 	if (!parse_args(argc, argv) || !init_data(argc, argv, &program))
-		return (1);
+		return (1); // remember to free and close stuff
 	if (!start_simulation(&program))
-		return (1);
+		return (1); // remember to free and close stuff
 	cleanup(&program);
 	return(0);
 }

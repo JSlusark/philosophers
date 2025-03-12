@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/12 12:26:09 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/12 14:01:10 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,7 @@ bool check_death(t_philos *philo)
 		pthread_mutex_unlock(&philo->args->dead_lock);
 		return true;
 	}
-
-	if ((current_time - philo->lastmeal_time) >= philo->args->ttd)
+	if ((current_time - philo->last_meal_time) >= philo->args->ttd) // actually  last meal should be meal staered
 	{
 		philo->args->found_dead = true;
 		pthread_mutex_lock(&philo->args->output_lock);
@@ -71,7 +70,7 @@ bool check_death(t_philos *philo)
 		pthread_mutex_unlock(&philo->args->dead_lock);
 		return true;
 	}
-
+	// printf(GREEN"%zu %d time without eating: %lu\n"RESET, current_time, philo->id, current_time - philo->last_meal_time);
 	pthread_mutex_unlock(&philo->args->dead_lock);
 	return false;
 }
@@ -91,8 +90,10 @@ void *routine(void *arg)
 			break;
 		}
 		pthread_mutex_unlock(&philo->args->dead_lock);
-
-		eats(philo);
+		if(philo->id)
+			eats(philo, philo->left_fork, philo->right_fork);
+		else
+			eats(philo, philo->right_fork, philo->left_fork);
 		sleeps(philo);
 		thinks(philo);
 	}
@@ -149,7 +150,7 @@ bool	init_philos(t_data *program)
 		program->philo[i].id = i + 1;
 		program->philo[i].args = &program->args;
 		program->philo[i].meals_n = 0;
-		program->philo[i].lastmeal_time = get_curr_ms(program->args.unix_start);
+		program->philo[i].last_meal_time = get_curr_ms(program->args.unix_start);
 		program->philo[i].left_fork = &program->forks[i];
 		program->philo[i].right_fork = &program->forks[(i + 1) % program->args.philos_n];
 		i++;

@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:47:09 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/10 18:05:04 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/12 14:01:10 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ typedef struct s_philos // struct for each philosopher
 {
 	int				id;
 	pthread_t		lifespan;
-	size_t			lastmeal_time;
+	size_t			last_meal_time;
 	int				meals_n;
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
@@ -91,7 +91,7 @@ bool	init_forks(t_data *program);
 bool	start_simulation(t_data *program);
 void	*routine(void *arg); // starts the routine of each philosopher
 void	thinks(t_philos *philo);
-void	eats(t_philos *philo);
+void	eats(t_philos *philo, pthread_mutex_t *first_fork, pthread_mutex_t *second_fork);
 void	sleeps(t_philos *philo);
 bool	check_death(t_philos *philo);
 void	cleanup(t_data *program);
