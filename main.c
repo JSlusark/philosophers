@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:46:53 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/10 16:35:49 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/12 12:27:05 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,12 +26,22 @@ void cleanup(t_data *program) {
 }
 
 
-bool	parse_args(int argc)
+bool	parse_args(int argc, char **argv)
 {
+	int i = 1; // started from arg 1[0]
 	if(argc != 5 && argc != 6)
 	{
 		printf("Error: run ./philos philos_n ttd tte tts and eats_n(optional)\n");
 		return (false);
+	}
+	while(i < argc)
+	{
+		if(ft_atoi(argv[i]) < 0)
+		{
+			printf("Error: ./philo args cannot be of negative value\n");
+			return (false);
+		}
+		i++;
 	}
 	return (true);
 }
@@ -43,7 +53,7 @@ int main(int argc, char **argv)
 
 	(void) philosopher;
 	// remember to add if philos_n is 1 and philos_n is even or odd conditions
-	if (!parse_args(argc) || !init_data(argc, argv, &program))
+	if (!parse_args(argc, argv) || !init_data(argc, argv, &program))
 		return (1);
 	if (!start_simulation(&program))
 		return (1);

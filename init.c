@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/10 18:21:59 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/12 12:26:09 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -205,14 +205,7 @@ bool	init_data(int argc, char **argv, t_data *program)
 	pthread_mutex_init(&program->args.output_lock, NULL);
 	program->args.unix_start = get_unix_timestamp(); // ms since 1970 to start of program, does not need conversion (it's in milliseconds)
 	if (argc == 6)
-	{
 		program->args.meals_limit = ft_atoi(argv[5]);
-		if(program->args.meals_limit < 0)
-		{
-			printf("Error: the 5th value(meals_limit) should not be negative\n");// check if condition needed for meals_limit
-			return (false);
-		}
-	}
 	else
 		program->args.meals_limit = -1; // no limit should be given if not inputed from the user
 	if(!check_values(&program->args))
