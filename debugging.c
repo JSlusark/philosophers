@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/12 12:13:22 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/13 15:38:34 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/13 16:03:00 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,18 +90,11 @@ void print_status(t_data *program)
 
         printf("Last Meal Time: %zums", philo->last_meal_time);
 
-        // // Timer stopped
-        // printf("\n    Timer stopped: %zums\n",
-        //     philo->status.timer_stopped >= philo->args->ttd ? DEATH : RESET, // Set color
-        //     philo->status.timer_stopped, // Value
-        //     RESET);
-
-           // Timer stopped (fixing the issue here)
+        // Timer stopped (fixing the issue here)
         printf("\n    Timer since end of last meal: %s%zums%s\n",
             philo->status.timer_stopped >= philo->args->ttd ? DEATH : RESET, // Set color
             philo->status.timer_stopped, // Value
             RESET); // Reset color
-        // printf("\n    Timer Stopped: %zums\n", philo->status.timer_stopped);
     }
 
     printf("------------------------------------------------------------\n");

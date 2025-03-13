@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/13 15:50:50 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/13 16:14:49 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,98 +14,88 @@
 
 void *monitor(void *arg)
 {
-	t_data *program = (t_data *)arg;
-	int	i;
+    t_data *program = (t_data *)arg;
+    int	i;
 
-	while (true)
-	{
-		// Lock the mutex to check death condition
-		pthread_mutex_lock(&program->args.dead_lock);
-		if (program->args.found_dead)
-		{
-			pthread_mutex_unlock(&program->args.dead_lock);
-			break;
-		}
-		pthread_mutex_unlock(&program->args.dead_lock);
-		// // check if philosopher dies in other isntances
+    while (true)
+    {
+        // Lock the mutex to check death condition
+        pthread_mutex_lock(&program->args.dead_lock);
+        if (program->args.found_dead)
+        {
+            pthread_mutex_unlock(&program->args.dead_lock);
+            break;
+        }
+        pthread_mutex_unlock(&program->args.dead_lock);
+        // // check if philosopher dies in other isntances
 		for (i = 0; i < program->args.philos_n; i++)
 		{
-			// monitor_alert(&program->philo[i]);
-			// printf(GREEN"--------  MONITOR: %d last_meal_timer: %zu\n"RESET, program->philo[i].id, get_curr_ms( program->philo[i].args->unix_start) - program->philo[i].last_meal_time);
-			pthread_mutex_lock(&program->philo[i].args->dead_lock);
-			if ((get_curr_ms(program->philo[i].args->unix_start) - program->philo[i].last_meal_time) >= program->philo->args->ttd && !program->philo->status.is_eating && !program->philo->status.is_dead) // actually  last meal should be meal staered
+			pthread_mutex_lock(&program->philo[i].status_lock);
+			if ((get_curr_ms(program->philo[i].args->unix_start) - program->philo[i].last_meal_time) >= program->philo->args->ttd)
 			{
-				 printf(DEATH"%zu %d died AHHHH - timer: %zu\n"RESET, get_curr_ms(program->philo->args->unix_start), program->philo->id, (get_curr_ms(program->philo->args->unix_start) - program->philo->last_meal_time));
-				 pthread_mutex_lock(&program->philo->status_lock);
-				 program->philo->status.is_dead = true;
-				 program->args.found_dead = true;
-				 pthread_mutex_unlock(&program->philo->status_lock);
-				 pthread_mutex_unlock(&program->philo[i].args->dead_lock);
-				 break;
+				printf(DEATH"%zu %d died AHHHH - timer: %zu\n"RESET, get_curr_ms(program->philo->args->unix_start), program->philo[i].id, (get_curr_ms(program->philo->args->unix_start) - program->philo->last_meal_time));
+
+				program->args.found_dead = true;
+				program->philo[i].status.is_dead = true;
+
+				pthread_mutex_unlock(&program->philo[i].status_lock);
+				return NULL; // Stop monitor thread immediately
 			}
-			pthread_mutex_unlock(&program->philo[i].args->dead_lock);
+			pthread_mutex_unlock(&program->philo[i].status_lock);
 		}
 
-		// Check if all philosophers have eaten enough times
-		if (program->args.meals_limit > 0)
-		{
-			int meals_met = 0;
-			for (i = 0; i < program->args.philos_n; i++)
-			{
-				if (program->philo[i].meals_n >= program->args.meals_limit)
-				{
-					meals_met++;
-					pthread_mutex_lock(&program->args.dead_lock);
-					program->philo[i].status.timer_stopped = get_curr_ms(program->philo[i].args->unix_start) - program->philo[i].last_meal_time;
-					pthread_mutex_unlock(&program->args.dead_lock);
-				}
-			}
-			if (meals_met == program->args.philos_n)
-			{
-				pthread_mutex_lock(&program->args.dead_lock);
-				program->args.found_dead = true;
-				pthread_mutex_unlock(&program->args.dead_lock);
-				break;
-			}
-		}
-		usleep(500);
-	}
-	return (NULL);
+        // Check if all philosophers have eaten enough times
+        if (program->args.meals_limit > 0)
+        {
+            int meals_met = 0;
+            for (i = 0; i < program->args.philos_n; i++)
+            {
+                if (program->philo[i].meals_n >= program->args.meals_limit)
+                {
+                    meals_met++;
+                    pthread_mutex_lock(&program->args.dead_lock);
+                    program->philo[i].status.timer_stopped = get_curr_ms(program->philo[i].args->unix_start) - program->philo[i].last_meal_time;
+                    pthread_mutex_unlock(&program->args.dead_lock);
+                }
+            }
+            if (meals_met == program->args.philos_n)
+            {
+                pthread_mutex_lock(&program->args.dead_lock);
+                program->args.found_dead = true;
+                pthread_mutex_unlock(&program->args.dead_lock);
+                break;
+            }
+        }
+        usleep(500);
+    }
+    return (NULL);
 }
 
 
 bool check_death(t_philos *philo)
 {
-	// size_t current_time = get_curr_ms(philo->args->unix_start);
+    size_t current_time = get_curr_ms(philo->args->unix_start);
 
-	pthread_mutex_lock(&philo->args->dead_lock);
-	if (philo->args->found_dead) // <-------------------- this function stops philosophers to continue with their routine if someone else died
-	{
-		printf("wiwiwiwi 2\n");
-		pthread_mutex_unlock(&philo->args->dead_lock);
-		return true;
-	}
-	// if ((current_time - philo->last_meal_time) >= philo->args->ttd) // actually  last meal should be meal staered ----- THIS IS WHAT KILLS PHILOSOPHERS
-	// {
-	// 	printf("wiwiwiwi 3\n");
-	// 	pthread_mutex_lock(&philo->args->dead_lock);
-	// 	philo->args->found_dead = true;
-	// 	pthread_mutex_lock(&philo->args->dead_lock);
+    pthread_mutex_lock(&philo->args->dead_lock);
+    if (philo->args->found_dead)
+    {
+        pthread_mutex_unlock(&philo->args->dead_lock);
+        return true;
+    }
 
-	// 	pthread_mutex_lock(&philo->args->output_lock);
-	// 	printf(DEATH"%zu %d died BUUUUUU\n"RESET, current_time, philo->id);
-	// 	pthread_mutex_lock(&philo->status_lock);
-	// 	philo->status.is_dead = true;
-	// 	philo->status.timer_stopped = current_time - philo->last_meal_time;
-	// 	pthread_mutex_unlock(&philo->status_lock);
-	// 	pthread_mutex_unlock(&philo->args->output_lock);
-	// 	pthread_mutex_unlock(&philo->args->dead_lock);
-	// 	return true;
-	// }
-	// // printf(GREEN"%zu %d time without eating: %lu\n"RESET, current_time, philo->id, current_time - philo->last_meal_time);
-	pthread_mutex_unlock(&philo->args->dead_lock);
-	return false;
+    if ((current_time - philo->last_meal_time) >= philo->args->ttd)
+    {
+        printf(DEATH"%zu %d died BUUUUUU\n"RESET, current_time, philo->id);
+        philo->args->found_dead = true;
+        philo->status.is_dead = true;
+        pthread_mutex_unlock(&philo->args->dead_lock);
+        return true;
+    }
+
+    pthread_mutex_unlock(&philo->args->dead_lock);
+    return false;
 }
+
 
 
 void *routine(void *arg)

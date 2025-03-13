@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/13 15:43:50 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/13 16:17:13 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,16 +19,6 @@
 	{
 		pthread_mutex_unlock(&philo->args->output_lock);
 		return ;
-	}
-
-	if ((get_curr_ms(philo->args->unix_start) - philo->last_meal_time) >= philo->args->ttd) // actually  last meal should be meal staered
-	{
-		pthread_mutex_lock(&philo->args->output_lock);
-		philo->args->found_dead = true;
-		printf(DEATH"%zu %d died IUUUUUUJHHH\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
-		pthread_mutex_unlock(&philo->args->output_lock);
-		// pthread_mutex_unlock(&philo->args->dead_lock);
-		// return true;
 	}
 	pthread_mutex_lock(&philo->status_lock);
 	philo->status.is_sleeping = false;
@@ -47,18 +37,6 @@
 		 pthread_mutex_unlock(&philo->args->output_lock);
 		 return ;
 	 }
-	//  if (get_curr_ms(philo->args->unix_start) >= philo->args->ttd) // actually  last meal should be meal staered
-	//  {
-	// 	 printf("wiwiwiwi 3\n");
-	// 	 philo->args->found_dead = true;
-	// 	//  pthread_mutex_lock(&philo->args->output_lock);
-	// 	 printf(DEATH"%zu %d died YUUUU\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
-	// 	 philo->status.is_dead = true;
-	// 	 philo->status.timer_stopped = get_curr_ms(philo->args->unix_start) - philo->last_meal_time;
-	// 	 pthread_mutex_unlock(&philo->args->output_lock);
-	// 	 pthread_mutex_unlock(&philo->args->dead_lock);
-	// 	 return;
-	//  }
 	pthread_mutex_lock(&philo->status_lock);
 	philo->status.is_eating = false;
 	philo->status.is_thinking = false;
@@ -92,10 +70,10 @@
 	philo->status.is_sleeping = false;
 	philo->status.is_thinking = false;
 	philo->status.is_eating = true;
+	philo->last_meal_time = get_curr_ms(philo->args->unix_start); // Update last meal time
 	pthread_mutex_unlock(&philo->status_lock);
 	pthread_mutex_unlock(&philo->args->output_lock);
 
-	philo->last_meal_time = get_curr_ms(philo->args->unix_start); // Update last meal time
 	ft_usleep(philo->args->tte, philo);
 	philo->meals_n++;
 
