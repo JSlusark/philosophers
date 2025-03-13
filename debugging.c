@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/12 12:13:22 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/12 18:24:48 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/13 11:42:00 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,19 @@
 // 3. thinking times
 
 #include "philos.h"
+
+void monitor_alert(t_philos *philo)
+{
+    size_t time_since_last_meal = get_curr_ms(philo->args->unix_start) - philo->last_meal_time;
+
+    // Print only if the time since the last meal is greater than or equal to time to die
+    if (time_since_last_meal >= philo->args->ttd)
+    {
+        printf(DEATH"ALERT: %zu %d HAS TO DIE! Last meal timer: %zums\n"RESET,
+               get_curr_ms(philo->args->unix_start), philo->id, time_since_last_meal);
+    }
+}
+
 void print_mealcount(t_data *program)
 {
     printf(FORK1"\nPHILO MEAL COUNT:\n"RESET);
@@ -84,7 +97,7 @@ void print_status(t_data *program)
         //     RESET);
 
            // Timer stopped (fixing the issue here)
-        printf("\n    Timer stopped: %s%zums%s\n",
+        printf("\n    Timer since end of last meal: %s%zums%s\n",
             philo->status.timer_stopped >= philo->args->ttd ? DEATH : RESET, // Set color
             philo->status.timer_stopped, // Value
             RESET); // Reset color

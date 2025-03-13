@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:47:09 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/12 17:15:50 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/13 11:22:20 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,7 @@ void *monitor(void *arg);
 //testing and debugging
 void print_mealcount(t_data *program);
 void print_status(t_data *program);
+void monitor_alert(t_philos *philo);
 
 
 
