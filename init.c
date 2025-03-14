@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/13 16:14:49 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/14 12:56:41 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ void *monitor(void *arg)
 			pthread_mutex_lock(&program->philo[i].status_lock);
 			if ((get_curr_ms(program->philo[i].args->unix_start) - program->philo[i].last_meal_time) >= program->philo->args->ttd)
 			{
-				printf(DEATH"%zu %d died AHHHH - timer: %zu\n"RESET, get_curr_ms(program->philo->args->unix_start), program->philo[i].id, (get_curr_ms(program->philo->args->unix_start) - program->philo->last_meal_time));
+				printf(DEATH"%zu %d died AHHHH - timer: %zu\n"RESET, get_curr_ms(program->philo->args->unix_start), program->philo[i].id, (get_curr_ms(program->philo->args->unix_start) - program->philo[i].last_meal_time));
 
 				program->args.found_dead = true;
 				program->philo[i].status.is_dead = true;
@@ -116,10 +116,10 @@ void *routine(void *arg)
 		// Check if this philosopher should die
 		// if (check_death(philo))
 		// 	break;
-		// if(philo->id % 2 == 0)
-		eats(philo, philo->left_fork, philo->right_fork);
-		// else
-		// eats(philo, philo->right_fork, philo->left_fork); // even die
+		if(philo->id % 2 == 0)
+			eats(philo, philo->left_fork, philo->right_fork);
+		else
+			eats(philo, philo->right_fork, philo->left_fork); // even die
 		sleeps(philo);
 		thinks(philo);
 	}
