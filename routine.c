@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/14 14:11:38 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/14 16:15:20 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,10 @@
 	philo->status.is_thinking = true;
 	pthread_mutex_unlock(&philo->status_lock);
 	// printf(THINK"%zu %d is thinking - timer:%zu\n"RESET, get_curr_ms(philo->args->unix_start), philo->id, (get_curr_ms(philo->args->unix_start) - philo->last_meal_time));
-	printf(THINK"%zu %d is thinking\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
-	usleep(500); // As i use a lag of 500ms in ft_usleep, i need to add this to avoid problems
+	printf("%zu %d is thinking\n", get_curr_ms(philo->args->unix_start), philo->id);
 	pthread_mutex_unlock(&philo->args->output_lock);
+	ft_usleep(1, philo); // the sleep function needs to be put afterthe lock to avoid problems with bigger philo n
+	// usleep(500); // As i use a lag of 500ms in ft_usleep, i need to add this to avoid problems
  }
 
  void sleeps(t_philos *philo)
@@ -45,7 +46,7 @@
 	philo->status.is_sleeping = true;
 	pthread_mutex_unlock(&philo->status_lock);
 	// printf(SLEEP"%zu %d is sleeping - timer: %zu\n"RESET, get_curr_ms(philo->args->unix_start), philo->id, (get_curr_ms(philo->args->unix_start) - philo->last_meal_time));
-	printf(SLEEP"%zu %d is sleeping\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
+	printf("%zu %d is sleeping\n", get_curr_ms(philo->args->unix_start), philo->id);
 	pthread_mutex_unlock(&philo->args->output_lock);
 	ft_usleep(philo->args->tts, philo);
  }
@@ -63,9 +64,9 @@
 		return;
 	}
 	// printf(FORK1"%zu %d has taken a fork - timer %zu\n"RESET, get_curr_ms(philo->args->unix_start), philo->id, (get_curr_ms(philo->args->unix_start) - philo->last_meal_time));
-	printf(FORK1"%zu %d has taken a fork\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
+	printf("%zu %d has taken a fork\n", get_curr_ms(philo->args->unix_start), philo->id);
 	// printf(FORK2"%zu %d has taken a fork - timer %zu\n"RESET, get_curr_ms(philo->args->unix_start), philo->id, (get_curr_ms(philo->args->unix_start) - philo->last_meal_time));
-	printf(FORK2"%zu %d has taken a fork\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
+	printf("%zu %d has taken a fork\n", get_curr_ms(philo->args->unix_start), philo->id);
 	// printf("%zu %d is eating - timer: %zu\n", get_curr_ms(philo->args->unix_start), philo->id, (get_curr_ms(philo->args->unix_start) - philo->last_meal_time));
 	printf("%zu %d is eating\n", get_curr_ms(philo->args->unix_start), philo->id);
 	pthread_mutex_lock(&philo->status_lock);
