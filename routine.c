@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/14 13:26:17 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/14 14:11:38 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,11 @@
 		pthread_mutex_unlock(&philo->args->output_lock);
 		return ;
 	}
-	pthread_mutex_unlock(&philo->args->output_lock);
 	pthread_mutex_lock(&philo->status_lock);
 	philo->status.is_sleeping = false;
 	philo->status.is_eating = false;
 	philo->status.is_thinking = true;
 	pthread_mutex_unlock(&philo->status_lock);
-	pthread_mutex_unlock(&philo->args->output_lock);
 	// printf(THINK"%zu %d is thinking - timer:%zu\n"RESET, get_curr_ms(philo->args->unix_start), philo->id, (get_curr_ms(philo->args->unix_start) - philo->last_meal_time));
 	printf(THINK"%zu %d is thinking\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
 	usleep(500); // As i use a lag of 500ms in ft_usleep, i need to add this to avoid problems
