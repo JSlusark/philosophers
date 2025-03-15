@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/15 18:12:39 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/15 19:15:30 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ bool someone_died(t_philos *philo)
 	// 	return true;
     pthread_mutex_lock(&philo->args->alert_lock);
     // size_t current_time = get_curr_ms(philo->args->unix_start);
-    if (philo->args->found_dead && !philo->status.is_dead)
+    if (philo->args->found_dead || philo->status.is_dead)
     {
 		printf("--- philo %d says someone is dead!!\n", philo->id);
         pthread_mutex_unlock(&philo->args->alert_lock);
@@ -105,8 +105,8 @@ void *routine(void *arg)
 {
 	t_philos *philo = (t_philos *)arg;
 
-	// while (!someone_died(philo))
-	while (!philo->status.is_dead || !philo->args->found_dead)
+	// while (!philo->status.is_dead || !philo->args->found_dead)
+	while (!someone_died(philo))
 	{
 		// Check if the simulation should stop
 		// pthread_mutex_lock(&philo->args->dead_lock);
@@ -136,7 +136,7 @@ void *routine(void *arg)
 
 bool start_simulation(t_data *program)
 {
-	pthread_t monitor_thread;
+	// pthread_t monitor_thread;
 	int i;
 
 	// Create philosopher threads
@@ -150,18 +150,18 @@ bool start_simulation(t_data *program)
 	}
 
 	// Create monitor thread
-	if (pthread_create(&monitor_thread, NULL, &monitor, program) != 0)
-	{
-		printf("Error: failed to create monitor thread\n");
-		return (false);
-	}
+	// if (pthread_create(&monitor_thread, NULL, &monitor, program) != 0)
+	// {
+	// 	printf("Error: failed to create monitor thread\n");
+	// 	return (false);
+	// }
 
 	// Wait for philosophers to finish
 	for (i = 0; i < program->args.philos_n; i++)
 		pthread_join(program->philo[i].lifespan, NULL);
 
 	// Wait for monitor to finish
-	pthread_join(monitor_thread, NULL);
+	// pthread_join(monitor_thread, NULL);
 	print_status(program);
 	print_mealcount(program); // debugger for meal count
 
@@ -188,7 +188,6 @@ bool	init_philos(t_data *program)
 		program->philo[i].meals_n = 0;
 		program->philo[i].left_fork = &program->forks[i];
 		program->philo[i].right_fork = &program->forks[(i + 1) % program->args.philos_n];
-		// pthread_mutex_init(&program->philo[i].status_lock, NULL);
 		program->philo[i].status.elapsed_time = 0;
 		program->philo[i].status.is_eating = false;
 		program->philo[i].status.is_sleeping = false;
