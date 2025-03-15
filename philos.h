@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philos.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:47:09 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/13 13:31:10 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/15 18:10:48 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,9 @@ typedef struct s_rules
 	size_t				tts; // time it takes for each philo to sleep
 	bool			found_dead; // flag for checking if a philo has died and stops the simulation
 	pthread_mutex_t	dead_lock;
+	pthread_mutex_t	alert_lock;
 	pthread_mutex_t	output_lock;
+	pthread_mutex_t status_lock;
 	long			unix_start;
 }	t_rules;
 
@@ -51,7 +53,7 @@ typedef struct s_props
 	bool is_sleeping;
 	bool is_thinking;
 	bool is_dead;
-	size_t timer_stopped; // time since last meal time until stop of simulation
+	size_t elapsed_time; // time since last meal time until stop of simulation
 }	t_props;
 
 // Philosopher
@@ -65,7 +67,7 @@ typedef struct s_philos
 	pthread_mutex_t	*right_fork;
 	t_rules			*args; // pointer to args struct (which modifies the data args of the program)
 	t_props			status; // status of the philosopher
-	pthread_mutex_t status_lock;
+	// pthread_mutex_t status_lock;
 } t_philos;
 
 // Global Simulation Data

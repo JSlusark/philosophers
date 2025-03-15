@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   debugging.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/12 12:13:22 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/13 16:03:00 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/15 18:10:48 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,8 +92,8 @@ void print_status(t_data *program)
 
         // Timer stopped (fixing the issue here)
         printf("\n    Timer since end of last meal: %s%zums%s\n",
-            philo->status.timer_stopped >= philo->args->ttd ? DEATH : RESET, // Set color
-            philo->status.timer_stopped, // Value
+            philo->status.elapsed_time >= philo->args->ttd ? DEATH : RESET, // Set color
+            philo->status.elapsed_time, // Value
             RESET); // Reset color
     }
 
