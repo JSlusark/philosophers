@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/15 19:17:05 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/15 21:17:01 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ bool starvation(t_philos * philo, pthread_mutex_t *active_mutex)
 		pthread_mutex_unlock(active_mutex); // fork mutex and others
 		return true;
 	}
+	pthread_mutex_unlock(active_mutex); // fork mutex and others
 	return false;
 }
 
@@ -90,13 +91,13 @@ bool starvation(t_philos * philo, pthread_mutex_t *active_mutex)
 
  void sleeps(t_philos *philo)
  {
-	// pthread_mutex_lock(&philo->args->status_lock);
+	pthread_mutex_lock(&philo->args->status_lock);
 	philo->status.is_eating = false; // same here
 	philo->status.is_thinking = false;
 	philo->status.is_sleeping = true;
 	// STARVATION NEEDS TO START WITH A MUTEX_LOCK AS IT WILL CLOSE IT INSIDE!!
-	// if(starvation(philo, &philo->args->status_lock)) // checks if philo starved before printing (unlocks fork)
-	// 	return;
+	if(starvation(philo, &philo->args->status_lock)) // checks if philo starved before printing (unlocks fork)
+		return;
 	print_activity(philo, get_curr_ms(philo->args->unix_start), "is sleeping"); // message lok/unlock used for printing
 	ft_usleep(philo->args->tts, philo);
  }
@@ -138,26 +139,13 @@ bool starvation(t_philos * philo, pthread_mutex_t *active_mutex)
 
 	// 2. lock output and print - so that the philosophers eating won't race against eachothee
 	print_activity(philo, philo->last_meal_time, "is eating");
-	// pthread_mutex_lock(&philo->args->output_lock);
-	// // printf("%zu %d is eating\n", philo->last_meal_time, philo->id);
-	// printf("%zu %d is eating", philo->last_meal_time, philo->id);
-	// if (philo->status.is_eating)
-    // 	printf(GREEN" <---- eating"RESET);
-	// else if (philo->status.is_sleeping)
-	// 	printf(SLEEP" <---- sleeping"RESET);
-	// else if (philo->status.is_thinking)
-	// 	printf(THINK" <---- thinking"RESET);
-	// else
-	// 	printf(FORK1" <---- no status is active"RESET);
-	// printf("\n");
-	// pthread_mutex_unlock(&philo->args->output_lock);
 
-	ft_usleep(philo->args->tte, philo);// still in the 2nd fork lock, being locked for the usleep time
+	ft_usleep(philo->args->tte, philo);// still in the forks lock, being locked for the usleep time
 
 	// 3. fork releasing - as the time of eating passed the philo can finally release the forsks to the
 	pthread_mutex_unlock(first_fork);
 	pthread_mutex_unlock(second_fork);
-	usleep(500);// <--------------------------------- I PUT THIS SO THE PHILO WILL WAIT BEFORE THINK AND SLEEP IF SOMEONE DIES AT THE SAME TIME
+	// usleep(500);// <--------------------------------- I PUT THIS SO THE PHILO WILL WAIT BEFORE THINK AND SLEEP IF SOMEONE DIES AT THE SAME TIME
 
 
 

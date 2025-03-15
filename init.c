@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/15 19:15:30 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/15 21:12:45 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,38 +19,41 @@ void *monitor(void *arg)
 
     while (true)
     {
-        // Lock the mutex to check death condition
-        pthread_mutex_lock(&program->args.dead_lock);
+        //1. lock for manager check - status lock
+        pthread_mutex_lock(&program->args.status_lock);
         if (program->args.found_dead)
         {
-            pthread_mutex_unlock(&program->args.dead_lock);
+            pthread_mutex_unlock(&program->args.status_lock);
             break;
         }
-        pthread_mutex_unlock(&program->args.dead_lock);
-        // // check if philosopher dies in other isntances
-		for (i = 0; i < program->args.philos_n; i++)
+		else
 		{
-			pthread_mutex_lock(&program->args.status_lock);
-			if ((get_curr_ms(program->philo[i].args->unix_start) - program->philo[i].last_meal_time) >= program->philo[i].args->ttd && !program->philo[i].status.is_eating )
+            pthread_mutex_unlock(&program->args.status_lock);
+			for (i = 0; i < program->args.philos_n; i++)
 			{
-				// printf(DEATH"%zu %d died AHHHH - timer: %zu\n"RESET, get_curr_ms(program->philo[i].args->unix_start), program->philo[i].id, (get_curr_ms(program->philo[i].args->unix_start) - program->philo[i].last_meal_time));
-				printf(DEATH"%zu %d died AHHHH - timer: %zu"RESET, get_curr_ms(program->philo[i].args->unix_start), program->philo[i].id, (get_curr_ms(program->philo[i].args->unix_start) - program->philo[i].last_meal_time));
-				if (program->philo[i].status.is_eating)
-					printf(GREEN" <---- eating"RESET);
-				else if (program->philo[i].status.is_sleeping)
-					printf(SLEEP" <---- sleeping"RESET);
-				else if (program->philo[i].status.is_thinking)
-					printf(THINK" <---- thinking"RESET);
-				else
-					printf(FORK1" <---- no status is active"RESET);
-			printf("\n");
-				program->args.found_dead = true;
-				program->philo[i].status.is_dead = true;
+				pthread_mutex_lock(&program->args.status_lock);
+				program->philo[i].status.elapsed_time = get_curr_ms(program->philo[i].args->unix_start) - program->philo[i].last_meal_time;
+				if (program->philo[i].status.elapsed_time >= program->args.ttd && !program->philo[i].status.is_eating )
+				{
+					// printf(DEATH"%zu %d died AHHHH - timer: %zu\n"RESET, get_curr_ms(program->philo[i].args->unix_start), program->philo[i].id, (get_curr_ms(program->philo[i].args->unix_start) - program->philo[i].last_meal_time));
+					printf(DEATH"%zu %d died AHHHH - timer: %zu"RESET, get_curr_ms(program->philo[i].args->unix_start), program->philo[i].id, (get_curr_ms(program->philo[i].args->unix_start) - program->philo[i].last_meal_time));
+					program->args.found_dead = true;
+					program->philo[i].status.is_dead = true;
+					if (program->philo[i].status.is_eating)
+						printf(GREEN" <---- eating"RESET);
+					else if (program->philo[i].status.is_sleeping)
+						printf(SLEEP" <---- sleeping"RESET);
+					else if (program->philo[i].status.is_thinking)
+						printf(THINK" <---- thinking"RESET);
+					else
+						printf(FORK1" <---- no status is active"RESET);
+					printf("\n");
 
+					pthread_mutex_unlock(&program->args.status_lock);
+					return NULL; // Stop monitor thread immediately
+				}
 				pthread_mutex_unlock(&program->args.status_lock);
-				return NULL; // Stop monitor thread immediately
 			}
-			pthread_mutex_unlock(&program->args.status_lock);
 		}
 
 		// printf("ciao");
@@ -106,6 +109,7 @@ void *routine(void *arg)
 	t_philos *philo = (t_philos *)arg;
 
 	// while (!philo->status.is_dead || !philo->args->found_dead)
+	// while (1)
 	while (!someone_died(philo))
 	{
 		// Check if the simulation should stop
@@ -136,7 +140,7 @@ void *routine(void *arg)
 
 bool start_simulation(t_data *program)
 {
-	// pthread_t monitor_thread;
+	pthread_t monitor_thread;
 	int i;
 
 	// Create philosopher threads
@@ -150,18 +154,18 @@ bool start_simulation(t_data *program)
 	}
 
 	// Create monitor thread
-	// if (pthread_create(&monitor_thread, NULL, &monitor, program) != 0)
-	// {
-	// 	printf("Error: failed to create monitor thread\n");
-	// 	return (false);
-	// }
+	if (pthread_create(&monitor_thread, NULL, &monitor, program) != 0)
+	{
+		printf("Error: failed to create monitor thread\n");
+		return (false);
+	}
 
 	// Wait for philosophers to finish
 	for (i = 0; i < program->args.philos_n; i++)
 		pthread_join(program->philo[i].lifespan, NULL);
 
 	// Wait for monitor to finish
-	// pthread_join(monitor_thread, NULL);
+	pthread_join(monitor_thread, NULL);
 	print_status(program);
 	print_mealcount(program); // debugger for meal count
 
