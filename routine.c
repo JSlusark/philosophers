@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/16 16:18:53 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/16 16:37:03 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,6 @@ bool starvation(t_philos * philo, pthread_mutex_t *locked_mutex) // if someone d
 		return;
 	print_activity(philo, get_curr_ms(philo->args->unix_start), "is thinking", 1); // message lok/unlock used for printing
 	// ft_usleep(1, philo); // the sleep function needs to be put afterthe lock to avoid problems with bigger philo n
-	// usleep(500); // As i use a lag of 500ms in ft_usleep, i need to add this to avoid problems
  }
 
  void sleeps(t_philos *philo)
@@ -78,22 +77,18 @@ bool starvation(t_philos * philo, pthread_mutex_t *locked_mutex) // if someone d
 	if(starvation(philo, NULL)) // checks if philo starved before printing
 		return;
 	print_activity(philo, get_curr_ms(philo->args->unix_start), "is sleeping", philo->args->tts); // message lok/unlock used for printing
-	// ft_usleep(philo->args->tts, philo);
  }
 
  void eats(t_philos *philo, pthread_mutex_t *first_fork, pthread_mutex_t *second_fork)
  {
-
 	//1. fork grabbing
 	pthread_mutex_lock(first_fork);
 	if(starvation(philo, first_fork)) // checks if philo starved before printing
 		return; // 1st fork is unlocked only if philo is dead
-	print_activity(philo, get_curr_ms(philo->args->unix_start), "has taken 1ST fork",0);
-
+	printf(FORK2"%zu %d has taken 1ST fork\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
 	//2. fork grabbing
 	pthread_mutex_lock(second_fork);
-	print_activity(philo, get_curr_ms(philo->args->unix_start), "has taken 2ND fork",0); // output locks/unlocks to avoid racing for printing
-
+	printf(FORK2"%zu %d has taken 2ND fork\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
 	// 3. philo eats as soon as taken both forks
 	philo->last_meal_time = get_curr_ms(philo->args->unix_start);
 	philo->is_eating = true; ///// <--------
@@ -101,23 +96,12 @@ bool starvation(t_philos * philo, pthread_mutex_t *locked_mutex) // if someone d
 	philo->is_sleeping = false;
 	philo->meals_n++;
 	print_activity(philo, philo->last_meal_time, "is eating", philo->args->tte);  // output locks/unlocks to avoid racing for printing
-	// ft_usleep(philo->args->tte, philo);// philo has to eat (hold forks) for  this amount of time
 
 	// 4. fork releasing
-	print_activity(philo, get_curr_ms(philo->args->unix_start), "has released 1ST fork",0); // output locks/unlocks to avoid racing for printing
+	printf(FORK1"%zu %d has released 1ST fork\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
 	pthread_mutex_unlock(first_fork);
-	// pthread_mutex_lock(&philo->args->output_lock);
-	// this should be printed after philo dies too no?
-	// printf(FORK2"%zu %d has released second fork - FOUND DEAD: %d\n"RESET, get_curr_ms(philo->args->unix_start), philo->id, philo->args->found_dead);
-	// pthread_mutex_unlock(&philo->args->output_lock);
-	print_activity(philo, get_curr_ms(philo->args->unix_start), "has released 2nD fork",0); // output locks/unlocks to avoid racing for printing
+	printf(FORK1"%zu %d has released 1ST fork\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
 	pthread_mutex_unlock(second_fork);
 	usleep(500);// <--------------------------------- I PUT THIS SO THE PHILO WILL WAIT BEFORE THINK AND SLEEP IF SOMEONE DIES AT THE SAME TIME
-
-
-
-
-
-
  }
 

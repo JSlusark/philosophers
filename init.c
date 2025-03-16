@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/16 16:20:00 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/16 16:38:56 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,17 +110,13 @@ void *routine(void *arg)
 
 	// while (!philo->status.is_dead || !philo->args->found_dead)
 	// while (1)
+	if(philo->id % 2 == 0)
+			ft_usleep(philo->args->tte / 2, philo); // delay to avoid even philos to be quicker than odd
+
 	while (!someone_died(philo))
 	{
-		if (philo->args->found_dead)
-		{
-			break;
-		}
 		if(philo->id % 2 != 0) // odd get first the left (theirs) and teh right (i - 1)
-		{
-			ft_usleep(1, philo); // i need the delay to avoid that if a odd philo is quicker than another odd, an even will follow
 			eats(philo, philo->left_fork, philo->right_fork);
-		}
 		else // even get first the right (i - 1) and then left (theirs)
 			eats(philo, philo->right_fork, philo->left_fork); // even die
 		sleeps(philo);
