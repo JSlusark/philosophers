@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:47:09 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/16 14:17:36 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/16 17:59:28 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,6 +101,8 @@ void	eats(t_philos *philo, pthread_mutex_t *first_fork, pthread_mutex_t *second_
 void	sleeps(t_philos *philo);
 void	cleanup(t_data *program);
 void *monitor(void *arg);
+void	print_activity(t_philos *philo, size_t time, char *message, size_t delay);
+bool starvation(t_philos * philo, pthread_mutex_t *locked_mutex); // if someone does not die left fork shoudl not be released
 
 //testing and debugging
 void print_mealcount(t_data *program);
