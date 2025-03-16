@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/15 21:12:45 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/16 13:27:17 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,13 +190,20 @@ bool	init_philos(t_data *program)
 		program->philo[i].id = i + 1;
 		program->philo[i].args = &program->args;
 		program->philo[i].meals_n = 0;
-		program->philo[i].left_fork = &program->forks[i];
-		program->philo[i].right_fork = &program->forks[(i + 1) % program->args.philos_n];
+		program->philo[i].left_fork = &program->forks[i]; // left fork equal to philo n
+		if(i == 0) // philo[0] 1 should get fork[last_i] philos_n-1
+			program->philo[i].right_fork = &program->forks[program->args.philos_n - 1];
+		else
+			program->philo[i].right_fork = &program->forks[i - 1];
 		program->philo[i].status.elapsed_time = 0;
 		program->philo[i].status.is_eating = false;
 		program->philo[i].status.is_sleeping = false;
 		program->philo[i].status.is_thinking = false;
 		program->philo[i].status.is_dead = false;
+		printf(SLEEP"	Philo %d: left_fork = fork[%ld], right_fork = fork[%ld]\n"RESET,
+			program->philo[i].id,
+			program->philo[i].left_fork - program->forks,
+			program->philo[i].right_fork - program->forks);
 		i++;
 	}
 	return (true);
