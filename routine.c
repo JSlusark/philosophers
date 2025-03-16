@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/16 16:37:03 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/16 16:43:14 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,8 +99,9 @@ bool starvation(t_philos * philo, pthread_mutex_t *locked_mutex) // if someone d
 
 	// 4. fork releasing
 	printf(FORK1"%zu %d has released 1ST fork\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
+	// printf(FORK1"%zu %d has released 1ST fork\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
 	pthread_mutex_unlock(first_fork);
-	printf(FORK1"%zu %d has released 1ST fork\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
+	printf(FORK1"%zu %d has released 2ND fork\n"RESET, get_curr_ms(philo->args->unix_start), philo->id);
 	pthread_mutex_unlock(second_fork);
 	usleep(500);// <--------------------------------- I PUT THIS SO THE PHILO WILL WAIT BEFORE THINK AND SLEEP IF SOMEONE DIES AT THE SAME TIME
  }

@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/16 16:38:56 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/16 16:49:25 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,15 +87,10 @@ void *monitor(void *arg)
 
 bool someone_died(t_philos *philo)
 {
-
-	// if (!philo || !philo->args) // NULL check
-	// 	return true;
-	// usleep(500);
-    // size_t current_time = get_curr_ms(philo->args->unix_start);
     if (philo->args->found_dead || philo->is_dead || philo->elapsed_time >= philo->args->ttd)
     {
 		pthread_mutex_lock(&philo->args->alert_lock);
-		printf("--- philo %d says someone is dead!!\n", philo->id);
+		printf("	-> %zu philo %d says someone is dead⁉️\n", get_curr_ms(philo->args->unix_start), philo->id);
         pthread_mutex_unlock(&philo->args->alert_lock);
         return true;
     }
