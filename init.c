@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/16 15:14:04 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/16 16:20:00 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ void *monitor(void *arg)
         //         break;
         //     }
         // }
-        usleep(500); /// commened for now
+        // usleep(500); /// commened for now
     }
     return (NULL);
 }
@@ -112,23 +112,13 @@ void *routine(void *arg)
 	// while (1)
 	while (!someone_died(philo))
 	{
-
-		// Check if the simulation should stop
-		// pthread_mutex_lock(&philo->args->dead_lock);
 		if (philo->args->found_dead)
 		{
-			// pthread_mutex_unlock(&philo->args->dead_lock);
 			break;
 		}
-		// pthread_mutex_unlock(&philo->args->dead_lock);
-
-		// Check if this philosopher should die
-		// if (check_death(philo))
-		// 	break;
-
 		if(philo->id % 2 != 0) // odd get first the left (theirs) and teh right (i - 1)
 		{
-			// usleep(500);
+			ft_usleep(1, philo); // i need the delay to avoid that if a odd philo is quicker than another odd, an even will follow
 			eats(philo, philo->left_fork, philo->right_fork);
 		}
 		else // even get first the right (i - 1) and then left (theirs)
@@ -142,7 +132,7 @@ void *routine(void *arg)
 
 bool start_simulation(t_data *program)
 {
-	pthread_t monitor_thread;
+	// pthread_t monitor_thread;
 	int i;
 
 	// Create philosopher threads
@@ -156,20 +146,20 @@ bool start_simulation(t_data *program)
 	}
 
 	// Create monitor thread
-	if (pthread_create(&monitor_thread, NULL, &monitor, program) != 0)
-	{
-		printf("Error: failed to create monitor thread\n");
-		return (false);
-	}
+	// if (pthread_create(&monitor_thread, NULL, &monitor, program) != 0)
+	// {
+	// 	printf("Error: failed to create monitor thread\n");
+	// 	return (false);
+	// }
 
 	// Wait for philosophers to finish
 	for (i = 0; i < program->args.philos_n; i++)
 		pthread_join(program->philo[i].lifespan, NULL);
 
 	// Wait for monitor to finish
-	pthread_join(monitor_thread, NULL);
-	print_status(program);
-	print_mealcount(program); // debugger for meal count
+	// pthread_join(monitor_thread, NULL);
+	// print_status(program);
+	// print_mealcount(program); // debugger for meal count
 
 
 	return (true);
