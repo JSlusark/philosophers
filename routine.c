@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/16 15:32:53 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/16 15:34:57 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,8 +92,6 @@ bool starvation(t_philos * philo, pthread_mutex_t *locked_mutex) // if someone d
 
 	//2. fork grabbing
 	pthread_mutex_lock(second_fork);
-	if(starvation(philo, second_fork)) // checks if philo starved before printing
-		return; // 2nd fork is unlocked only if philo is dead
 	print_activity(philo, philo->elapsed_time, "has taken first fork"); // output locks/unlocks to avoid racing for printing
 
 	// 3. philo eats as soon as taken both forks
