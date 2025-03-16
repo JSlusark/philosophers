@@ -1,0 +1,52 @@
+[34m	Philo 1: left_fork = fork[0], right_fork = fork[3]
+[0m[34m	Philo 2: left_fork = fork[1], right_fork = fork[0]
+[0m[34m	Philo 3: left_fork = fork[2], right_fork = fork[1]
+[0m[34m	Philo 4: left_fork = fork[3], right_fork = fork[2]
+[0m0 1 has taken first fork - timer [32m0ms[0m
+0 1 has taken second fork - timer [32m0ms[0m
+0 1 is eating[32m <---- eating[0m - timer [32m0ms[0m
+1 3 has taken first fork - timer [0m1ms[0m
+1 3 has taken second fork - timer [0m1ms[0m
+1 3 is eating[32m <---- eating[0m - timer [32m0ms[0m
+100 2 has taken first fork - timer [0m100ms[0m
+101 1 is sleeping[34m <---- sleeping[0m - timer [0m101ms[0m
+101 2 has taken second fork - timer [0m100ms[0m
+101 2 is eating[32m <---- eating[0m - timer [32m0ms[0m
+101 4 has taken first fork - timer [0m101ms[0m
+101 4 has taken second fork - timer [0m101ms[0m
+101 4 is eating[32m <---- eating[0m - timer [32m0ms[0m
+101 3 is sleeping[34m <---- sleeping[0m - timer [0m100ms[0m
+[31m200 1 died AHHHH - timer: 200[0m[34m <---- sleeping[0m
+[31m201 3 IS DEAD!!!![0m[35m <---- thinking[0m - timer [31m200ms[0m
+--- philo 3 says someone is dead!!
+[31m201 1 IS DEAD!!!![0m[35m <---- thinking[0m - timer [31m201ms[0m
+--- philo 1 says someone is dead!!
+201 2 is sleeping[34m <---- sleeping[0m - timer [0m100ms[0m
+201 4 is sleeping[34m <---- sleeping[0m - timer [0m100ms[0m
+[31m301 2 IS DEAD!!!![0m[35m <---- thinking[0m - timer [31m200ms[0m
+--- philo 2 says someone is dead!!
+[31m301 4 IS DEAD!!!![0m[35m <---- thinking[0m - timer [31m200ms[0m
+--- philo 4 says someone is dead!!
+[32m
+Simulation Parameters:
+[0mPHILOSOPHERS: [32m4[0m | TTD: [31m200ms[0m | TTE: 100ms | TTS: 100ms | Meal Limit: [0m-1[0m
+
+Philosopher Status at End of Simulation:
+------------------------------------------------------------
+[33m[1] [0mEat: [0mfalse[0m | Sleep: [0mfalse[0m | Think: [32mtrue [0m | Death: [31myes[0m | Last Meal Time: 0ms
+    Timer since end of last meal: [31m201ms[0m
+[33m[2] [0mEat: [0mfalse[0m | Sleep: [0mfalse[0m | Think: [32mtrue [0m | Death: [31myes[0m | Last Meal Time: 101ms
+    Timer since end of last meal: [31m200ms[0m
+[33m[3] [0mEat: [0mfalse[0m | Sleep: [0mfalse[0m | Think: [32mtrue [0m | Death: [31myes[0m | Last Meal Time: 1ms
+    Timer since end of last meal: [31m200ms[0m
+[33m[4] [0mEat: [0mfalse[0m | Sleep: [0mfalse[0m | Think: [32mtrue [0m | Death: [31myes[0m | Last Meal Time: 101ms
+    Timer since end of last meal: [31m200ms[0m
+------------------------------------------------------------
+[33m
+PHILO MEAL COUNT:
+[0m-----------------------------------------
+Philosopher 1 ate 1 times.
+Philosopher 2 ate 1 times.
+Philosopher 3 ate 1 times.
+Philosopher 4 ate 1 times.
+-----------------------------------------

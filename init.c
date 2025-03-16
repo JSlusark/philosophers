@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/16 13:27:17 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/16 15:14:04 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,18 +32,18 @@ void *monitor(void *arg)
 			for (i = 0; i < program->args.philos_n; i++)
 			{
 				pthread_mutex_lock(&program->args.status_lock);
-				program->philo[i].status.elapsed_time = get_curr_ms(program->philo[i].args->unix_start) - program->philo[i].last_meal_time;
-				if (program->philo[i].status.elapsed_time >= program->args.ttd && !program->philo[i].status.is_eating )
+				program->philo[i].elapsed_time = get_curr_ms(program->philo[i].args->unix_start) - program->philo[i].last_meal_time;
+				if (program->philo[i].elapsed_time >= program->args.ttd && !program->philo[i].is_eating )
 				{
 					// printf(DEATH"%zu %d died AHHHH - timer: %zu\n"RESET, get_curr_ms(program->philo[i].args->unix_start), program->philo[i].id, (get_curr_ms(program->philo[i].args->unix_start) - program->philo[i].last_meal_time));
 					printf(DEATH"%zu %d died AHHHH - timer: %zu"RESET, get_curr_ms(program->philo[i].args->unix_start), program->philo[i].id, (get_curr_ms(program->philo[i].args->unix_start) - program->philo[i].last_meal_time));
 					program->args.found_dead = true;
-					program->philo[i].status.is_dead = true;
-					if (program->philo[i].status.is_eating)
+					program->philo[i].is_dead = true;
+					if (program->philo[i].is_eating)
 						printf(GREEN" <---- eating"RESET);
-					else if (program->philo[i].status.is_sleeping)
+					else if (program->philo[i].is_sleeping)
 						printf(SLEEP" <---- sleeping"RESET);
-					else if (program->philo[i].status.is_thinking)
+					else if (program->philo[i].is_thinking)
 						printf(THINK" <---- thinking"RESET);
 					else
 						printf(FORK1" <---- no status is active"RESET);
@@ -79,7 +79,7 @@ void *monitor(void *arg)
         //         break;
         //     }
         // }
-        usleep(500);
+        usleep(500); /// commened for now
     }
     return (NULL);
 }
@@ -90,15 +90,15 @@ bool someone_died(t_philos *philo)
 
 	// if (!philo || !philo->args) // NULL check
 	// 	return true;
-    pthread_mutex_lock(&philo->args->alert_lock);
+	// usleep(500);
     // size_t current_time = get_curr_ms(philo->args->unix_start);
-    if (philo->args->found_dead || philo->status.is_dead)
+    if (philo->args->found_dead || philo->is_dead || philo->elapsed_time >= philo->args->ttd)
     {
+		pthread_mutex_lock(&philo->args->alert_lock);
 		printf("--- philo %d says someone is dead!!\n", philo->id);
         pthread_mutex_unlock(&philo->args->alert_lock);
         return true;
     }
-    pthread_mutex_unlock(&philo->args->alert_lock);
     return false;
 }
 
@@ -112,24 +112,26 @@ void *routine(void *arg)
 	// while (1)
 	while (!someone_died(philo))
 	{
+
 		// Check if the simulation should stop
 		// pthread_mutex_lock(&philo->args->dead_lock);
-		// if (philo->args->found_dead)
-		// {
-		// 	pthread_mutex_unlock(&philo->args->dead_lock);
-		// 	break;
-		// }
+		if (philo->args->found_dead)
+		{
+			// pthread_mutex_unlock(&philo->args->dead_lock);
+			break;
+		}
 		// pthread_mutex_unlock(&philo->args->dead_lock);
 
 		// Check if this philosopher should die
 		// if (check_death(philo))
 		// 	break;
-		if(philo->id % 2 == 0)
+
+		if(philo->id % 2 != 0) // odd get first the left (theirs) and teh right (i - 1)
 		{
 			// usleep(500);
 			eats(philo, philo->left_fork, philo->right_fork);
 		}
-		else
+		else // even get first the right (i - 1) and then left (theirs)
 			eats(philo, philo->right_fork, philo->left_fork); // even die
 		sleeps(philo);
 		thinks(philo);
@@ -195,11 +197,11 @@ bool	init_philos(t_data *program)
 			program->philo[i].right_fork = &program->forks[program->args.philos_n - 1];
 		else
 			program->philo[i].right_fork = &program->forks[i - 1];
-		program->philo[i].status.elapsed_time = 0;
-		program->philo[i].status.is_eating = false;
-		program->philo[i].status.is_sleeping = false;
-		program->philo[i].status.is_thinking = false;
-		program->philo[i].status.is_dead = false;
+		program->philo[i].elapsed_time = 0;
+		program->philo[i].is_eating = false;
+		program->philo[i].is_sleeping = false;
+		program->philo[i].is_thinking = false;
+		program->philo[i].is_dead = false;
 		printf(SLEEP"	Philo %d: left_fork = fork[%ld], right_fork = fork[%ld]\n"RESET,
 			program->philo[i].id,
 			program->philo[i].left_fork - program->forks,

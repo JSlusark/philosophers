@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:47:09 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/15 18:10:48 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/16 14:17:36 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,15 +46,15 @@ typedef struct s_rules
 	long			unix_start;
 }	t_rules;
 
-// Philosopher State
-typedef struct s_props
-{
-	bool is_eating;
-	bool is_sleeping;
-	bool is_thinking;
-	bool is_dead;
-	size_t elapsed_time; // time since last meal time until stop of simulation
-}	t_props;
+// // Philosopher State
+// typedef struct s_props
+// {
+// 	bool is_eating;
+// 	bool is_sleeping;
+// 	bool is_thinking;
+// 	bool is_dead;
+// 	size_t elapsed_time; // time since last meal time until stop of simulation
+// }	t_props;
 
 // Philosopher
 typedef struct s_philos
@@ -66,7 +66,12 @@ typedef struct s_philos
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
 	t_rules			*args; // pointer to args struct (which modifies the data args of the program)
-	t_props			status; // status of the philosopher
+	// t_props			status; // status of the philosopher
+	bool is_eating;
+	bool is_sleeping;
+	bool is_thinking;
+	bool is_dead;
+	size_t elapsed_time; // time since last meal time until stop of simulation
 	// pthread_mutex_t status_lock;
 } t_philos;
 
@@ -94,7 +99,6 @@ void	*routine(void *arg); // starts the routine of each philosopher
 void	thinks(t_philos *philo);
 void	eats(t_philos *philo, pthread_mutex_t *first_fork, pthread_mutex_t *second_fork);
 void	sleeps(t_philos *philo);
-bool	check_death(t_philos *philo);
 void	cleanup(t_data *program);
 void *monitor(void *arg);
 

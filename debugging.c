@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/12 12:13:22 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/15 18:10:48 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/16 15:11:17 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,34 +66,34 @@ void print_status(t_data *program)
 
         // Eating status
         printf("Eat: %s%s%s | ",
-               philo->status.is_eating ? GREEN : RESET,
-               philo->status.is_eating ? "true " : "false",
+               philo->is_eating ? GREEN : RESET,
+               philo->is_eating ? "true " : "false",
                RESET);
 
         // Sleeping status
         printf("Sleep: %s%s%s | ",
-               philo->status.is_sleeping ? GREEN : RESET,
-               philo->status.is_sleeping ? "true " : "false",
+               philo->is_sleeping ? GREEN : RESET,
+               philo->is_sleeping ? "true " : "false",
                RESET);
 
         // Thinking status
         printf("Think: %s%s%s | ",
-               philo->status.is_thinking ? GREEN : RESET,
-               philo->status.is_thinking ? "true " : "false",
+               philo->is_thinking ? GREEN : RESET,
+               philo->is_thinking ? "true " : "false",
                RESET);
 
         // Death status
         printf("Death: %s%s%s | ",
-               philo->status.is_dead ? DEATH : RESET,
-               philo->status.is_dead ? "yes" : "no ",
+               philo->is_dead ? DEATH : RESET,
+               philo->is_dead ? "yes" : "no ",
                RESET);
 
         printf("Last Meal Time: %zums", philo->last_meal_time);
 
         // Timer stopped (fixing the issue here)
         printf("\n    Timer since end of last meal: %s%zums%s\n",
-            philo->status.elapsed_time >= philo->args->ttd ? DEATH : RESET, // Set color
-            philo->status.elapsed_time, // Value
+            philo->elapsed_time >= philo->args->ttd ? DEATH : RESET, // Set color
+            philo->elapsed_time, // Value
             RESET); // Reset color
     }
 
