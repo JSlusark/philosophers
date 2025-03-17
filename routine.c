@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/17 15:57:03 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/17 18:42:17 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ bool starvation(t_philos *philo, pthread_mutex_t *locked_mutex) // if someone do
 		/// need to pass normal time not elapsed time
 		print_activity(philo, get_curr_ms(philo->args->unix_start), DEATH"died"RESET,0);
 		if (locked_mutex)  // Check if mutex is valid before unlocking - sleeps an thinks pass NULL as no mutex is active
-			pthread_mutex_unlock(locked_// do not store it in the locked mutex perhaps?mutex);
+			pthread_mutex_unlock(locked_mutex);
 		return true;
 	}
 	return false;
