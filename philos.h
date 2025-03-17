@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philos.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:47:09 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/16 17:59:28 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/17 14:28:28 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ typedef struct s_philos
 	int				meals_n;
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
+	pthread_mutex_t	*timer_lock;
 	t_rules			*args; // pointer to args struct (which modifies the data args of the program)
 	// t_props			status; // status of the philosopher
 	bool is_eating;

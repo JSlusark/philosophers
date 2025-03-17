@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/16 18:58:45 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/17 15:55:50 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ void *routine(void *arg)
 
 bool start_simulation(t_data *program)
 {
-	pthread_t monitor_thread;
+	// pthread_t monitor_thread;
 	int i;
 
 	// Create philosopher threads
@@ -97,18 +97,18 @@ bool start_simulation(t_data *program)
 	}
 
 	// Create monitor thread
-	if (pthread_create(&monitor_thread, NULL, &monitor, program) != 0)
-	{
-		printf("Error: failed to create monitor thread\n");
-		return (false);
-	}
+	// if (pthread_create(&monitor_thread, NULL, &monitor, program) != 0)
+	// {
+	// 	printf("Error: failed to create monitor thread\n");
+	// 	return (false);
+	// }
 
 	// Wait for philosophers to finish
 	for (i = 0; i < program->args.philos_n; i++)
 		pthread_join(program->philo[i].lifespan, NULL);
 
 	// Wait for monitor to finish
-	pthread_join(monitor_thread, NULL);
+	// pthread_join(monitor_thread, NULL);
 	print_status(program);
 	print_mealcount(program); // debugger for meal count
 
