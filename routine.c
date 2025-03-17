@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   routine.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jslusark <jslusark@student.42berlin.de>    +#+  +:+       +#+        */
+/*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/16 18:35:11 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/17 10:24:05 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,11 @@
 
 void	print_activity(t_philos *philo, size_t time, char *message, size_t delay)
 {
-	// philo->elapsed_time = get_curr_ms(philo->args->unix_start) - philo->last_meal_time;
+	philo->elapsed_time = get_curr_ms(philo->args->unix_start) - philo->last_meal_time;
 	pthread_mutex_lock(&philo->args->output_lock);// i would call it activity lock
 	printf("%zu %d %s", time, philo->id, message);
-	printf(FORK2"  *🍝: %d* "RESET, philo->meals_n);
 	if (philo->is_eating)
-    	printf(GREEN" <---- eating"RESET);
+    	printf(GREEN" 🍝: %d <---- eating"RESET, philo->meals_n);
 	else if (philo->is_sleeping)
 		printf(SLEEP" <---- sleeping"RESET);
 	else if (philo->is_thinking)
@@ -47,11 +46,11 @@ void	print_activity(t_philos *philo, size_t time, char *message, size_t delay)
 bool starvation(t_philos *philo, pthread_mutex_t *locked_mutex) // if someone does not die left fork shoudl not be released
 {
 	philo->elapsed_time = get_curr_ms(philo->args->unix_start) - philo->last_meal_time;
-	if( philo->elapsed_time >= philo->args->ttd)
+	if( philo->elapsed_time >= philo->args->ttd && !philo->is_eating)
 	{
 		philo->is_dead = true;
 		philo->args->found_dead = true;
-		print_activity(philo, philo->elapsed_time, DEATH"IS DEAD ☠️ ☠️ ☠️ ☠️!!!!"RESET,0);
+		print_activity(philo, philo->elapsed_time, DEATH"died"RESET,0);
 		if (locked_mutex)  // Check if mutex is valid before unlocking - sleeps an thinks pass NULL as no mutex is active
 			pthread_mutex_unlock(locked_mutex);
 		return true;
