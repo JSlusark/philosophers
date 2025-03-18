@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/18 14:06:32 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/18 14:54:00 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ void	print_activity(t_philos *philo, size_t time, char *message, size_t delay)
 		usleep(delay * 1000);
 	else
 		usleep(500);
-		// ft_usleep(delay, philo); // this needs to be used only for thinking i guess??
+	// ft_usleep(delay, philo); // this needs to be used only for thinking i guess??
 }
 
 
@@ -81,7 +81,7 @@ bool starvation(t_philos *philo, pthread_mutex_t *locked_mutex) // if someone do
 
 	if( philo->args->found_dead)// checks if philo starved before printing
 		return;
-	print_activity(philo, get_curr_ms(philo->args->unix_start), "is thinking", 0); // message lok/unlock used for printing
+	print_activity(philo, get_curr_ms(philo->args->unix_start), THINK"is thinking"RESET, 0); // message lok/unlock used for printing
 	// ft_usleep(1, philo); // the sleep function needs to be put afterthe lock to avoid problems with bigger philo n
  }
 
@@ -93,7 +93,7 @@ bool starvation(t_philos *philo, pthread_mutex_t *locked_mutex) // if someone do
 	// philo->start_activity = get_curr_ms(philo->args->unix_start);
 	if( philo->args->found_dead ) // checks if philo starved before printing
 		return;
-	print_activity(philo,  get_curr_ms(philo->args->unix_start), "is sleeping", philo->args->tts); // message lok/unlock used for printing
+	print_activity(philo,  get_curr_ms(philo->args->unix_start), SLEEP"is sleeping"RESET, philo->args->tts); // message lok/unlock used for printing
 }
 
  void eats(t_philos *philo, pthread_mutex_t *first_fork, pthread_mutex_t *second_fork)
@@ -108,7 +108,7 @@ bool starvation(t_philos *philo, pthread_mutex_t *locked_mutex) // if someone do
 		return; // 1st fork is unlocked only if philo is dead
 	}
 	// printf(FORK2"%zu %d %s <--- %zu\n"RESET, get_curr_ms(philo->args->unix_start), philo->id, "took 1st fork", get_curr_ms(philo->args->unix_start) - philo->last_meal_time);
-	print_activity(philo, get_curr_ms(philo->args->unix_start), FORK2"has taken 1st fork"RESET, 0);  // output locks/unlocks to avoid racing for printing
+	print_activity(philo, get_curr_ms(philo->args->unix_start), FORK2"has taken a fork"RESET, 0);  // output locks/unlocks to avoid racing for printing
 
 
 
@@ -116,7 +116,7 @@ bool starvation(t_philos *philo, pthread_mutex_t *locked_mutex) // if someone do
 	pthread_mutex_lock(second_fork);
 	// philo->start_activity = get_curr_ms(philo->args->unix_start);
 	// printf(FORK2"%zu %d %s <--- %zu\n"RESET, get_curr_ms(philo->args->unix_start), philo->id, "took 2nd fork", get_curr_ms(philo->args->unix_start) - philo->last_meal_time);
-	print_activity(philo, get_curr_ms(philo->args->unix_start), FORK2"has taken 2nd fork"RESET, 0);  // output locks/unlocks to avoid racing for printing
+	print_activity(philo, get_curr_ms(philo->args->unix_start), FORK2"has taken a fork"RESET, 0);  // output locks/unlocks to avoid racing for printing
 
 	philo->last_meal_time = get_curr_ms(philo->args->unix_start);
 
@@ -128,11 +128,12 @@ bool starvation(t_philos *philo, pthread_mutex_t *locked_mutex) // if someone do
 	philo->meals_n++;
 	// pthread_mutex_unlock(&philo->args->status_lock);
 	print_activity(philo, philo->last_meal_time, "is eating", philo->args->tte);  // output locks/unlocks to avoid racing for printing
-
+	usleep(500); // <----- I ADDED THIS DELAY TO HELP WITH  3 610 200 100 (which delay was coming from fork release delay)
 	// 4. fork releasing
-	print_activity(philo, get_curr_ms(philo->args->unix_start), FORK1"has released 1st fork"RESET,0);  // output locks/unlocks to avoid racing for printing
+	// print_activity(philo, get_curr_ms(philo->args->unix_start), FORK1"has released 1st fork"RESET,0);  // output locks/unlocks to avoid racing for printing
 	pthread_mutex_unlock(first_fork);
-	print_activity(philo, get_curr_ms(philo->args->unix_start), FORK1"has released 2nd fork"RESET,0);  // output locks/unlocks to avoid racing for printing
+	usleep(500);// <----- I ADDED THIS DELAY TO HELP WITH  3 610 200 100 (which delay was coming from fork release delay
+	// print_activity(philo, get_curr_ms(philo->args->unix_start), FORK1"has released 2nd fork"RESET,0);  // output locks/unlocks to avoid racing for printing
 	pthread_mutex_unlock(second_fork);
 	// usleep(500);// <--------------------------------- I PUT THIS SO THE PHILO WILL WAIT BEFORE THINK AND SLEEP IF SOMEONE DIES AT THE SAME TIME
  }

@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/18 12:16:11 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/18 14:52:46 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,8 +65,9 @@ void *routine(void *arg)
 {
 	t_philos *philo = (t_philos *)arg;
 
-	if(philo->id % 2 == 0)
-			ft_usleep(philo->args->tte / 2, philo); // delay to avoid even philos to be quicker than odd
+	if(philo->id % 2 != 0)
+		ft_usleep(1, philo); // delay to avoid even philos to be quicker than odd
+			// usleep((philo->args->tte * 100) / philo->args->philos_n); // delay to avoid even philos to be quicker than odd
 
 	while (!someone_died(philo)) // why not using the starvation fucntion here instead?
 	{
