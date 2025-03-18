@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/17 15:55:50 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/18 12:16:11 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,6 +139,7 @@ bool	init_philos(t_data *program)
 		else
 			program->philo[i].right_fork = &program->forks[i - 1];
 		program->philo[i].elapsed_time = 0;
+		program->philo[i].start_activity = 0;
 		program->philo[i].is_eating = false;
 		program->philo[i].is_sleeping = false;
 		program->philo[i].is_thinking = false;

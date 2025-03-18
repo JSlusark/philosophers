@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:47:09 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/17 14:28:28 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/18 12:15:43 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,12 +67,14 @@ typedef struct s_philos
 	pthread_mutex_t	*right_fork;
 	pthread_mutex_t	*timer_lock;
 	t_rules			*args; // pointer to args struct (which modifies the data args of the program)
+
 	// t_props			status; // status of the philosopher
 	bool is_eating;
 	bool is_sleeping;
 	bool is_thinking;
 	bool is_dead;
 	size_t elapsed_time; // time since last meal time until stop of simulation
+	size_t start_activity; // time since last meal time until stop of simulation
 	// pthread_mutex_t status_lock;
 } t_philos;
 
