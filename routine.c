@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/18 12:41:45 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/18 14:06:32 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,11 @@ void	print_activity(t_philos *philo, size_t time, char *message, size_t delay)
 		RESET); // Reset color
 	printf("\n");
 	pthread_mutex_unlock(&philo->args->output_lock);
-	if(delay > 0)
-		ft_usleep(delay, philo);
+	if(delay >= 1) /// unsure to include 0 here
+		usleep(delay * 1000);
+	else
+		usleep(500);
+		// ft_usleep(delay, philo); // this needs to be used only for thinking i guess??
 }
 
 
@@ -78,7 +81,7 @@ bool starvation(t_philos *philo, pthread_mutex_t *locked_mutex) // if someone do
 
 	if( philo->args->found_dead)// checks if philo starved before printing
 		return;
-	print_activity(philo, get_curr_ms(philo->args->unix_start), "is thinking", 1); // message lok/unlock used for printing
+	print_activity(philo, get_curr_ms(philo->args->unix_start), "is thinking", 0); // message lok/unlock used for printing
 	// ft_usleep(1, philo); // the sleep function needs to be put afterthe lock to avoid problems with bigger philo n
  }
 
