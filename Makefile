@@ -28,10 +28,11 @@ IDLE = $(BLUE)Idle:$(RESET)
 
 # Compiler flags and commands
 CC = cc
-# CFLAGS = -Wall -Wextra -Werror -fsanitize=address -g
+# CFLAGS = -Wall -Wextra -Werror -fsanitize=thread -g
+# CC = clang
 CFLAGS = -Wall -Wextra -Werror -g
 REMOVE = rm -rf
-LDFLAGS = -lpthread
+LDFLAGS =  -lpthread
 
 
 # Source files
