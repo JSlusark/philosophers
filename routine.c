@@ -99,7 +99,9 @@ void	print_activity(t_philos *philo, size_t time, char *message, size_t delay)
 	philo->is_eating = true; ///// <--------
 	philo->is_thinking = false;
 	philo->is_sleeping = false;
+	pthread_mutex_lock(&philo->args->meal_lock);// i would call it activity lock
 	philo->meals_n++;
+	pthread_mutex_unlock(&philo->args->meal_lock);// i would call it activity lock
 	pthread_mutex_unlock(&philo->args->status_lock);
 	print_activity(philo, philo->last_meal_time, "is eating", philo->args->tte);  // output locks/unlocks to avoid racing for printing
 	usleep(500); // <----- I ADDED THIS DELAY TO HELP WITH  3 610 200 100 (which delay was coming from fork release delay)

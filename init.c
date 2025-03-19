@@ -19,8 +19,22 @@ void *monitor(void *arg)
 
 	while (1) //if monitor_death || monitor_meals is true, return  null
 	{
+		int group_ate_enough = 0;
 		for (i = 0; i < program->args.philos_n; i++)
 		{
+			pthread_mutex_lock(&program->philo[i].args->meal_lock);// i would call it activity lock
+			if (program->philo[i].meals_n >= program->args.meals_limit) // checks every philo to see if meals are met
+					group_ate_enough++;
+			pthread_mutex_unlock(&program->philo[i].args->meal_lock);// i would call it activity lock
+			if (group_ate_enough == program->args.philos_n)// after looping philo 1 by one we checked if all reached the eat_limit
+			{
+				pthread_mutex_lock(&program->philo[i].args->status_lock);// i would call it activity lock
+				program->args.found_dead = true;
+				pthread_mutex_unlock(&program->philo[i].args->status_lock);// i would call it activity lock
+				return(NULL);
+			}
+
+
 
 			pthread_mutex_lock(&program->philo[i].args->output_lock);// i would call it activity lock
 			// printf("---[MONITOR]--- philo %d\n", i);
@@ -59,32 +73,6 @@ void *monitor(void *arg)
 			}
 			pthread_mutex_unlock(&program->philo[i].args->output_lock);// i would call it activity lock
 		}
-
-
-
-
-		// monitor_death
-		// for (i = 0; i < program->args.philos_n; i++)
-		// {
-		// 	if (starvation(&program->philo[i], NULL)) // or meals met (no actobity to be prented) -- check if i need to put (&& !philo->eating)
-		// 		return NULL; // Stop monitor thread immediately, return true if not false
-		// }
-
-		// monitor_meals
-		// if (program->args.meals_limit > 0 && !program->args.found_dead)
-		// {
-		// 	int group_ate_enough = 0;
-		// 	for (i = 0; i < program->args.philos_n; i++)
-		// 	{
-		// 		if (program->philo[i].meals_n >= program->args.meals_limit) // checks every philo to see if meals are met
-		// 			group_ate_enough++;
-		// 	}
-		// 	if (group_ate_enough == program->args.philos_n)// after looping philo 1 by one we checked if all reached the eat_limit
-		// 	{
-		// 		program->args.found_dead = true;
-		// 		break;
-		// 	}
-		// }
 		usleep(500);
 	}
 	return (NULL); // from if monitor functions
@@ -244,7 +232,7 @@ bool	init_data(int argc, char **argv, t_data *program)
 	program->args.found_dead = false;
 	pthread_mutex_init(&program->args.dead_lock, NULL);
 	pthread_mutex_init(&program->args.status_lock, NULL);
-	pthread_mutex_init(&program->args.alert_lock, NULL); // alert tahet tells other philos to die if someone is dead
+	pthread_mutex_init(&program->args.meal_lock, NULL); // alert tahet tells other philos to die if someone is dead
 	pthread_mutex_init(&program->args.output_lock, NULL);
 	program->args.unix_start = get_unix_timestamp(); // ms since 1970 to start of program, does not need conversion (it's in milliseconds)
 	if (argc == 6)

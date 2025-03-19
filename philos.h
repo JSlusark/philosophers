@@ -40,7 +40,7 @@ typedef struct s_rules
 	size_t				tts; // time it takes for each philo to sleep
 	bool			found_dead; // flag for checking if a philo has died and stops the simulation
 	pthread_mutex_t	dead_lock;
-	pthread_mutex_t	alert_lock;
+	pthread_mutex_t	meal_lock;
 	pthread_mutex_t	output_lock;
 	pthread_mutex_t status_lock;
 	long			unix_start;

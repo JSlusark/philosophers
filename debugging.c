@@ -10,27 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-// adding debug printing for checking purposes at the end of the simulation
-
-// prints a list of philos and their status at the end of the simulation
-
-// 1. eating times - time waited before started eating
-// 2. sleeping times
-// 3. thinking times
-
 #include "philos.h"
-
-void monitor_alert(t_philos *philo)
-{
-    size_t time_since_last_meal = get_curr_ms(philo->args->unix_start) - philo->last_meal_time;
-
-    // Print only if the time since the last meal is greater than or equal to time to die
-    if (time_since_last_meal >= philo->args->ttd)
-    {
-        printf(DEATH"ALERT: %zu %d HAS TO DIE! Last meal timer: %zums\n"RESET,
-               get_curr_ms(philo->args->unix_start), philo->id, time_since_last_meal);
-    }
-}
 
 void print_mealcount(t_data *program)
 {
