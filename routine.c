@@ -35,7 +35,7 @@ void	print_activity(t_philos *philo, size_t time, char *message, size_t delay)
 	// elapsed time to check death
 	printf(" - timer %s%zums%s",
 		philo->elapsed_time == 0 ? GREEN :
-		(philo->elapsed_time >= philo->args->ttd ? DEATH : RESET), // Set color
+		(philo->elapsed_time >= philo->args->ttd ? DEATH"   ☠️ ☠️ ☠️   " : RESET), // Set color
 		philo->elapsed_time, // Value
 		RESET); // Reset color
 	printf("\n");

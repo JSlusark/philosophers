@@ -62,6 +62,7 @@ int main(int argc, char **argv)
 	t_philos			philosopher[200]; // tests will be done with no more than 200 philos
 
 	(void) philosopher;
+	printf(DEATH"--------------------- Welcome to code spaces ---------------------\n"RESET);
 	// remember to add if philos_n is 1 and philos_n is even or odd conditions
 	if (!parse_args(argc, argv) || !init_data(argc, argv, &program))
 		return (1); // remember to free and close stuff

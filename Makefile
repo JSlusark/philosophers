@@ -31,6 +31,8 @@ CC = cc
 # CFLAGS = -Wall -Wextra -Werror -fsanitize=address -g
 CFLAGS = -Wall -Wextra -Werror -g
 REMOVE = rm -rf
+LDFLAGS = -lpthread
+
 
 # Source files
 SRC = main.c \
@@ -55,7 +57,7 @@ all: $(NAME)
 
 # Compile the main executable
 $(NAME): $(OBJ)
-	@$(CC) $(CFLAGS) -I. $(OBJ) -o $(NAME)
+	@$(CC) $(CFLAGS) -I. $(OBJ) -lpthread -o $(NAME)
 	@echo "$(SUCCESS) $(MAGENTA)$(NAME)$(RESET) archived and indexed!"
 
 # Clean object files
