@@ -35,6 +35,7 @@ typedef struct s_rules
 {
 	int				philos_n; // number of philosophers and forks
 	int				meals_limit; // number of times philo has eaten - null by default
+	bool			no_optional;
 	size_t				ttd; // time limit a philo can stay without eating, if surpassed philo dies and simulation stops
 	size_t				tte; // time it takes for each philo to eat
 	size_t				tts; // time it takes for each philo to sleep

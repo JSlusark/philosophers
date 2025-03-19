@@ -22,20 +22,27 @@ void *monitor(void *arg)
 		int group_ate_enough = 0;
 		for (i = 0; i < program->args.philos_n; i++)
 		{
+			// count meals
 			pthread_mutex_lock(&program->philo[i].args->meal_lock);// i would call it activity lock
-			if (program->philo[i].meals_n >= program->args.meals_limit) // checks every philo to see if meals are met
-					group_ate_enough++;
-			pthread_mutex_unlock(&program->philo[i].args->meal_lock);// i would call it activity lock
-			if (group_ate_enough == program->args.philos_n)// after looping philo 1 by one we checked if all reached the eat_limit
+			if(program->philo[i].args->meals_limit != -1) // checks every philo to see if meals are met
 			{
-				pthread_mutex_lock(&program->philo[i].args->status_lock);// i would call it activity lock
-				program->args.found_dead = true;
-				pthread_mutex_unlock(&program->philo[i].args->status_lock);// i would call it activity lock
-				return(NULL);
+
+				if (program->philo[i].meals_n >= program->args.meals_limit) // checks every philo to see if meals are met
+				group_ate_enough++;
+				pthread_mutex_unlock(&program->philo[i].args->meal_lock);// i would call it activity lock
+				if (group_ate_enough == program->args.philos_n)// after looping philo 1 by one we checked if all reached the eat_limit
+				{
+					pthread_mutex_lock(&program->philo[i].args->status_lock);// i would call it activity lock
+					program->args.found_dead = true;
+					pthread_mutex_unlock(&program->philo[i].args->status_lock);// i would call it activity lock
+					return(NULL);
+				}
 			}
+			else
+				pthread_mutex_unlock(&program->philo[i].args->meal_lock);// i would call it activity lock
 
 
-
+			// monitor death
 			pthread_mutex_lock(&program->philo[i].args->output_lock);// i would call it activity lock
 			// printf("---[MONITOR]--- philo %d\n", i);
 				pthread_mutex_lock(&program->philo[i].args->status_lock);// i would call it activity lock
@@ -177,10 +184,10 @@ bool	init_philos(t_data *program)
 		program->philo[i].is_sleeping = false;
 		program->philo[i].is_thinking = false;
 		program->philo[i].is_dead = false;
-		printf(SLEEP"	Philo %d: left_fork = fork[%ld], right_fork = fork[%ld]\n"RESET,
-		program->philo[i].id,
-		program->philo[i].left_fork - program->forks,
-		program->philo[i].right_fork - program->forks);
+		// printf(SLEEP"	Philo %d: left_fork = fork[%ld], right_fork = fork[%ld]\n"RESET,
+		// program->philo[i].id,
+		// program->philo[i].left_fork - program->forks,
+		// program->philo[i].right_fork - program->forks);
 		i++;
 	}
 	return (true);
@@ -244,6 +251,8 @@ bool	init_data(int argc, char **argv, t_data *program)
 	if(!init_forks(program))
 		return (false);
 	if(!init_philos(program))
+		return (false);
+	if(program->args.meals_limit == 0 || program->args.philos_n == 1)
 		return (false);
 	return (true);
 }
