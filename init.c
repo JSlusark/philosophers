@@ -19,29 +19,73 @@ void *monitor(void *arg)
 
 	while (1) //if monitor_death || monitor_meals is true, return  null
 	{
-		// monitor_death
 		for (i = 0; i < program->args.philos_n; i++)
 		{
-			if (starvation(&program->philo[i], NULL)) // or meals met (no actobity to be prented) -- check if i need to put (&& !philo->eating)
-				return NULL; // Stop monitor thread immediately, return true if not false
+
+			pthread_mutex_lock(&program->philo[i].args->output_lock);// i would call it activity lock
+			// printf("---[MONITOR]--- philo %d\n", i);
+				pthread_mutex_lock(&program->philo[i].args->status_lock);// i would call it activity lock
+				// program->philo[i].elapsed_time = get_curr_ms(program->philo[i].args->unix_start) - program->philo[i].ref_time;
+				program->philo[i].elapsed_time = get_curr_ms(program->philo[i].args->unix_start) - program->philo[i].last_meal_time;
+				pthread_mutex_unlock(&program->philo[i].args->status_lock);// i would call it activity lock
+				// if(program->philo->is_dead)
+			// printf(DEATH"%d ELAPSED %zu\n"RESET, program->philo[i].id, program->philo[i].elapsed_time);// i would call it activity lock
+
+			if(program->philo[i].elapsed_time >= program->args.ttd && !program->philo[i].is_eating)
+			{
+				// printf(DEATH"---[MONITOR]--- philo %d\nisdead\n"RESET, i+1);
+				printf(DEATH"%zu %d is dead"RESET, get_curr_ms(program->args.unix_start), program->philo[i].id);// i would call it activity lock
+				if (program->philo[i].is_eating)
+				printf(GREEN" 🍝: %d <---- eating"RESET, program->philo[i].meals_n);
+				else if (program->philo[i].is_sleeping)
+				printf(SLEEP" <---- sleeping"RESET);
+				else if (program->philo[i].is_thinking)
+				printf(THINK" <---- thinking"RESET);
+				else
+				printf(FORK1" <---- no status is active"RESET);
+				// elapsed time to check death
+				printf(" - timer %s%zums%s",
+					program->philo[i].elapsed_time == 0 ? GREEN :
+					(program->philo[i].elapsed_time >= program->philo[i].args->ttd ? DEATH"   ☠️ ☠️ ☠️   " : RESET), // Set color
+					program->philo[i].elapsed_time, // Value
+					RESET); // Reset color
+					printf("\n");
+				pthread_mutex_lock(&program->philo[i].args->status_lock);// i would call it activity lock
+				program->philo[i].is_dead = true;
+				program->args.found_dead = true;
+				pthread_mutex_unlock(&program->philo[i].args->status_lock);// i would call it activity lock
+				pthread_mutex_unlock(&program->philo[i].args->output_lock);// i would call it activity lock
+				return(NULL);
+			}
+			pthread_mutex_unlock(&program->philo[i].args->output_lock);// i would call it activity lock
 		}
 
+
+
+
+		// monitor_death
+		// for (i = 0; i < program->args.philos_n; i++)
+		// {
+		// 	if (starvation(&program->philo[i], NULL)) // or meals met (no actobity to be prented) -- check if i need to put (&& !philo->eating)
+		// 		return NULL; // Stop monitor thread immediately, return true if not false
+		// }
+
 		// monitor_meals
-		if (program->args.meals_limit > 0 && !program->args.found_dead)
-		{
-			int group_ate_enough = 0;
-			for (i = 0; i < program->args.philos_n; i++)
-			{
-				if (program->philo[i].meals_n >= program->args.meals_limit) // checks every philo to see if meals are met
-					group_ate_enough++;
-			}
-			if (group_ate_enough == program->args.philos_n)// after looping philo 1 by one we checked if all reached the eat_limit
-			{
-				program->args.found_dead = true;
-				break;
-			}
-		}
-		usleep(500); /// commened for now
+		// if (program->args.meals_limit > 0 && !program->args.found_dead)
+		// {
+		// 	int group_ate_enough = 0;
+		// 	for (i = 0; i < program->args.philos_n; i++)
+		// 	{
+		// 		if (program->philo[i].meals_n >= program->args.meals_limit) // checks every philo to see if meals are met
+		// 			group_ate_enough++;
+		// 	}
+		// 	if (group_ate_enough == program->args.philos_n)// after looping philo 1 by one we checked if all reached the eat_limit
+		// 	{
+		// 		program->args.found_dead = true;
+		// 		break;
+		// 	}
+		// }
+		usleep(500);
 	}
 	return (NULL); // from if monitor functions
 }
@@ -49,13 +93,13 @@ void *monitor(void *arg)
 
 bool someone_died(t_philos *philo)
 {
-	if (philo->args->found_dead || philo->is_dead || philo->elapsed_time >= philo->args->ttd)
+	pthread_mutex_lock(&philo->args->status_lock);// i would call it activity lock
+	if (philo->args->found_dead || philo->is_dead)
 	{
-		// pthread_mutex_lock(&philo->args->alert_lock);
-		// printf("	-> %zu philo %d says someone is dead⁉️\n", get_curr_ms(philo->args->unix_start), philo->id);
-		// pthread_mutex_unlock(&philo->args->alert_lock);
+		pthread_mutex_unlock(&philo->args->status_lock);// i would call it activity lock
 		return true;
 	}
+	pthread_mutex_unlock(&philo->args->status_lock);// i would call it activity lock
 	return false;
 }
 
@@ -84,7 +128,7 @@ void *routine(void *arg)
 
 bool start_simulation(t_data *program)
 {
-	// pthread_t monitor_thread;
+	pthread_t monitor_thread;
 	int i;
 
 	// Create philosopher threads
@@ -98,18 +142,18 @@ bool start_simulation(t_data *program)
 	}
 
 	// Create monitor thread
-	// if (pthread_create(&monitor_thread, NULL, &monitor, program) != 0)
-	// {
-	// 	printf("Error: failed to create monitor thread\n");
-	// 	return (false);
-	// }
+	if (pthread_create(&monitor_thread, NULL, &monitor, program) != 0)
+	{
+		printf("Error: failed to create monitor thread\n");
+		return (false);
+	}
 
 	// Wait for philosophers to finish
 	for (i = 0; i < program->args.philos_n; i++)
 		pthread_join(program->philo[i].lifespan, NULL);
 
 	// Wait for monitor to finish
-	// pthread_join(monitor_thread, NULL);
+	pthread_join(monitor_thread, NULL);
 	print_status(program);
 	print_mealcount(program); // debugger for meal count
 
@@ -146,9 +190,9 @@ bool	init_philos(t_data *program)
 		program->philo[i].is_thinking = false;
 		program->philo[i].is_dead = false;
 		printf(SLEEP"	Philo %d: left_fork = fork[%ld], right_fork = fork[%ld]\n"RESET,
-			program->philo[i].id,
-			program->philo[i].left_fork - program->forks,
-			program->philo[i].right_fork - program->forks);
+		program->philo[i].id,
+		program->philo[i].left_fork - program->forks,
+		program->philo[i].right_fork - program->forks);
 		i++;
 	}
 	return (true);

@@ -27,10 +27,10 @@ FAILURE = $(RED)Failure:$(RESET)
 IDLE = $(BLUE)Idle:$(RESET)
 
 # Compiler flags and commands
-CC = cc
-# CFLAGS = -Wall -Wextra -Werror -fsanitize=thread -g
-# CC = clang
-CFLAGS = -Wall -Wextra -Werror -g
+CC = clang
+CFLAGS = -Wall -Wextra -Werror -fsanitize=thread -g -fno-omit-frame-pointer
+# CC = cc
+# CFLAGS = -Wall -Wextra -Werror -g
 REMOVE = rm -rf
 LDFLAGS =  -lpthread
 
