@@ -6,7 +6,7 @@
 #    By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/15 17:49:39 by jjs               #+#    #+#              #
-#    Updated: 2025/03/12 16:55:34 by jslusark         ###   ########.fr        #
+#    Updated: 2025/03/20 10:59:15 by jslusark         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,7 +32,7 @@ IDLE = $(BLUE)Idle:$(RESET)
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -g
 REMOVE = rm -rf
-LDFLAGS =  -lpthread
+# LDFLAGS =  -lpthread
 
 
 # Source files
@@ -100,3 +100,6 @@ helgrind:
 
 drd:
 	@valgrind --tool=drd --check-stack-var=yes ./$(NAME) $(ARGS)
+
+# save output without colors for visualizer
+# ./philo 199 800 200 200 | sed -E 's/\x1B\[[0-9;]*[mK]//g' > visual.txt
