@@ -6,7 +6,7 @@
 #    By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/15 17:49:39 by jjs               #+#    #+#              #
-#    Updated: 2025/03/20 16:27:05 by jslusark         ###   ########.fr        #
+#    Updated: 2025/03/20 17:14:58 by jslusark         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,10 +29,10 @@ IDLE = $(BLUE)Idle:$(RESET)
 # Compiler flags and commands
 # CC = clang
 # CFLAGS = -Wall -Wextra -Werror -fsanitize=thread -g -fno-omit-frame-pointer
+# CFLAGS = -Wall -Wextra -Werror -fsanitize=address
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -g
 REMOVE = rm -rf
-# LDFLAGS =  -lpthread
 
 
 # Source files
