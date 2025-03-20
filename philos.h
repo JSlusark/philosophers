@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:47:09 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/20 18:18:38 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/20 18:34:35 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,8 +75,8 @@ typedef struct s_data
 }	t_data;
 
 // Utility functions
-long	get_unix_timestamp(void);
 size_t	get_curr_ms(long start);
+long	get_unix_timestamp(void);
 int		ft_atoi(const char *nptr);
 void	ft_usleep(size_t milliseconds, t_philos *philo);
 // Initialization functions
@@ -95,7 +95,7 @@ void	*monitor(void *arg);
 void	print_activity(t_philos *philo, size_t time,
 			char *message, size_t delay);
 //testing and debugging
-void	routine_debugging(t_philos *philo); // to be used next to routine print
+void	routine_debugging(t_philos *philo);
 void	print_status(t_data *program);
 void	print_philo(t_philos *philo);
 void	print_mealcount(t_data *program);
