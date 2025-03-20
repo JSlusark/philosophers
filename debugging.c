@@ -6,11 +6,34 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/20 17:30:23 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/20 17:41:43 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/20 18:12:39 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philos.h"
+
+void	routine_debugging(t_philos *philo)
+{
+	if (philo->is_eating)
+		printf(GREEN"          <---- eating 🍝 #%d  "RESET, philo->meals_n);
+	else if (philo->is_sleeping)
+		printf(SLEEP"          <---- sleeping      "RESET);
+	else if (philo->is_thinking)
+		printf(THINK"     <---- thinking      "RESET);
+	else
+		printf(FORK1"      <---- no status     "RESET);
+	printf(" - timer ");
+	if (philo->elapsed_time == 0)
+		printf("%s%zums%s      ", GREEN, philo->elapsed_time, RESET);
+	else if (philo->elapsed_time >= philo->args->ttd)
+		printf("%s%zums%s      ", DEATH"  XXXXXXX  ",
+			philo->elapsed_time, RESET);
+	else
+		printf("%s%zums%s      ", RESET, philo->elapsed_time, RESET);
+	printf("p:%d s:%d", philo->is_dead,
+		philo->args->found_dead);
+	printf("\n");
+}
 
 void	print_philo(t_philos *philo)
 {

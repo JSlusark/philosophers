@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/20 17:42:08 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/20 17:59:37 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,21 +56,7 @@ void *monitor(void *arg)
 			{
 				// printf(DEATH"---[MONITOR]--- philo %d\nisdead\n"RESET, i+1);
 				printf(DEATH"%zu %d is dead"RESET, get_curr_ms(program->args.unix_start), program->philo[i].id);// i would call it activity lock
-				if (program->philo[i].is_eating)
-				printf(GREEN" 🍝: %d <---- eating"RESET, program->philo[i].meals_n);
-				else if (program->philo[i].is_sleeping)
-				printf(SLEEP" <---- sleeping"RESET);
-				else if (program->philo[i].is_thinking)
-				printf(THINK" <---- thinking"RESET);
-				else
-				printf(FORK1" <---- no status is active"RESET);
-				// elapsed time to check death
-				printf(" - timer %s%zums%s",
-					program->philo[i].elapsed_time == 0 ? GREEN :
-					(program->philo[i].elapsed_time >= program->philo[i].args->ttd ? DEATH"   ☠️ ☠️ ☠️   " : RESET), // Set color
-					program->philo[i].elapsed_time, // Value
-					RESET); // Reset color
-					printf("\n");
+				routine_debugging(&program->philo[i]);
 				pthread_mutex_lock(&program->philo[i].args->status_lock);// i would call it activity lock
 				program->philo[i].is_dead = true;
 				program->args.found_dead = true;
