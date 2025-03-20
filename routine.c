@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/20 12:22:11 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/20 17:28:12 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,12 @@ void	print_activity(t_philos *philo, size_t time, char *message, size_t delay)
 	//1. fork grabbing
 	pthread_mutex_lock(first_fork);
 	print_activity(philo, get_curr_ms(philo->args->unix_start), FORK2"has taken a fork"RESET, 0);  // output locks/unlocks to avoid racing for printing
+	if (philo->args->philos_n == 1)
+	{
+		usleep(philo->args->ttd * 1000);
+		pthread_mutex_unlock(first_fork);
+		return;
+	}
 	//2. fork grabbing
 	pthread_mutex_lock(second_fork);
 	print_activity(philo, get_curr_ms(philo->args->unix_start), FORK2"has taken a fork"RESET, 0);  // output locks/unlocks to avoid racing for printing

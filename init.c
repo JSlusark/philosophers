@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/20 16:22:35 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/20 17:27:38 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -253,7 +253,7 @@ bool	init_data(int argc, char **argv, t_data *program)
 		return (false);
 	if(!init_philos(program))
 		return (false);
-	if(program->args.meals_limit == 0 || program->args.philos_n == 1)
+	if(program->args.meals_limit == 0)// should 0 mean no meals or no stop
 		return (false);
 	return (true);
 }
