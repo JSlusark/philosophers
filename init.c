@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/20 19:17:11 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/20 20:13:37 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,143 +14,137 @@
 
 bool	meal_check(t_philos *philo, int *group_ate_enough)
 {
-	// should work without races
-	pthread_mutex_lock(&philo->args->meal_lock);// i would call it activity lock
-	if(philo->args->meals_limit != -1) // checks every philo to see if meals are met
+	pthread_mutex_lock(&philo->args->meal_lock);
+	if (philo->args->meals_limit != -1)
 	{
-
-		if (philo->meals_n >= philo->args->meals_limit) // checks every philo to see if meals are met
+		if (philo->meals_n >= philo->args->meals_limit)
 			(*group_ate_enough)++;
-		pthread_mutex_unlock(&philo->args->meal_lock);// i would call it activity lock
-		if (*group_ate_enough == philo->args->philos_n)// after looping philo 1 by one we checked if all reached the eat_limit
+		pthread_mutex_unlock(&philo->args->meal_lock);
+		if (*group_ate_enough == philo->args->philos_n)
 		{
-			pthread_mutex_lock(&philo->args->status_lock);// i would call it activity lock
+			pthread_mutex_lock(&philo->args->status_lock);
 			philo->args->found_dead = true;
-			pthread_mutex_unlock(&philo->args->status_lock);// i would call it activity lock
-			return(true);
+			pthread_mutex_unlock(&philo->args->status_lock);
+			return (true);
 		}
 	}
 	else
-		pthread_mutex_unlock(&philo->args->meal_lock);// i would call it activity lock
-	return(false);
+		pthread_mutex_unlock(&philo->args->meal_lock);
+	return (false);
 }
 
 bool	found_death(t_philos *philo)
 {
-	// monitor death
-	pthread_mutex_lock(&philo->args->output_lock);// i would call it activity lock
-	// printf("---[MONITOR]--- philo %d\n", i);
-		pthread_mutex_lock(&philo->args->status_lock);// i would call it activity lock
-		// philo->elapsed_time = get_curr_ms(philo->args->unix_start) - philo->ref_time;
-		philo->elapsed_time = get_curr_ms(philo->args->unix_start) - philo->last_meal_time;
-		pthread_mutex_unlock(&philo->args->status_lock);// i would call it activity lock
-		// if(program->philo->is_dead)
-	// printf(DEATH"%d ELAPSED %zu\n"RESET, philo->id, philo->elapsed_time);// i would call it activity lock
-
-	if(philo->elapsed_time >= philo->args->ttd && !philo->is_eating)
+	pthread_mutex_lock(&philo->args->output_lock);
+	pthread_mutex_lock(&philo->args->status_lock);
+	philo->elapsed_time = get_curr_ms(philo->args->unix_start)
+		- philo->last_meal_time;
+	pthread_mutex_unlock(&philo->args->status_lock);
+	if (philo->elapsed_time >= philo->args->ttd && !philo->is_eating)
 	{
-		// printf(DEATH"---[MONITOR]--- philo %d\nisdead\n"RESET, i+1);
-		printf(DEATH"%zu %d is dead"RESET, get_curr_ms(philo->args->unix_start), philo->id);// i would call it activity lock
+		printf(DEATH"%zu %d is dead"RESET, get_curr_ms(philo->args->unix_start), philo->id);
 		routine_debugging(philo);
-		pthread_mutex_lock(&philo->args->status_lock);// i would call it activity lock
+		pthread_mutex_lock(&philo->args->status_lock);
 		philo->is_dead = true;
 		philo->args->found_dead = true;
-		pthread_mutex_unlock(&philo->args->status_lock);// i would call it activity lock
-		pthread_mutex_unlock(&philo->args->output_lock);// i would call it activity lock
-		return(true);
+		pthread_mutex_unlock(&philo->args->status_lock);
+		pthread_mutex_unlock(&philo->args->output_lock);
+		return (true);
 	}
-	pthread_mutex_unlock(&philo->args->output_lock);// i would call it activity lock
-	return(false);
+	pthread_mutex_unlock(&philo->args->output_lock);
+	return (false);
 }
 
-void *monitor(void *arg)
+void	*monitor(void *arg)
 {
 	t_data	*program;
 	int		group_ate_enough;
 	int		i;
 
 	program = (t_data *)arg;
-	i = 0;
-	while (1) //if monitor_death || monitor_meals is true, return  null
+	while (1)
 	{
+		i = 0;
 		group_ate_enough = 0;
-		for (i = 0; i < program->args.philos_n; i++)
+		while (i < program->args.philos_n)
 		{
-			if(meal_check(&program->philo[i], &group_ate_enough))
-				return(NULL);
-			if(found_death(&program->philo[i]))// should work fine
-				return(NULL);
+			if (meal_check(&program->philo[i], &group_ate_enough))
+				return (NULL);
+			if (found_death(&program->philo[i]))
+				return (NULL);
+			i++;
 		}
 		usleep(500);
 	}
-	return (NULL); // from if monitor functions
+	return (NULL);
 }
 
-
-bool death_alert(t_philos *philo)
+bool	death_alert(t_philos *philo)
 {
-	pthread_mutex_lock(&philo->args->status_lock);// i would call it activity lock
+	pthread_mutex_lock(&philo->args->status_lock);
 	if (philo->args->found_dead || philo->is_dead)
 	{
-		pthread_mutex_unlock(&philo->args->status_lock);// i would call it activity lock
-		return true;
+		pthread_mutex_unlock(&philo->args->status_lock);
+		return (true);
 	}
-	pthread_mutex_unlock(&philo->args->status_lock);// i would call it activity lock
-	return false;
+	pthread_mutex_unlock(&philo->args->status_lock);
+	return (false);
 }
 
-
-
-void *routine(void *arg)
+void	*routine(void *arg)
 {
-	t_philos *philo = (t_philos *)arg;
+	t_philos	*philo;
 
-	if(philo->id % 2 == 0)
-		ft_usleep(1, philo); // delay to avoid even philos to be quicker than odd
-			// usleep((philo->args->tte * 100) / philo->args->philos_n); // delay to avoid even philos to be quicker than odd
-
-	while (!death_alert(philo)) // why not using the starvation fucntion here instead?
+	philo = (t_philos *)arg;
+	if (philo->id % 2 == 0)
+		ft_usleep(1, philo);
+	while (!death_alert(philo))
 	{
-		if(philo->id % 2 != 0) // odd get first the left (theirs) and teh right (i - 1)
+		if (philo->id % 2 != 0)
 			eats(philo, philo->left_fork, philo->right_fork);
-		else // even get first the right (i - 1) and then left (theirs)
-			eats(philo, philo->right_fork, philo->left_fork); // even die
+		else
+			eats(philo, philo->right_fork, philo->left_fork);
 		sleeps(philo);
 		thinks(philo);
 	}
 	return (NULL);
 }
 
-
-bool start_simulation(t_data *program)
+bool	start_simulation(t_data *program)
 {
-	pthread_t monitor_thread;
-	int i;
-	for (i = 0; i < program->args.philos_n; i++)
+	pthread_t	monitor_thread;
+	int			i;
+
+	i = 0;
+	while (i < program->args.philos_n)
 	{
-		if (pthread_create(&program->philo[i].lifespan, NULL, &routine, &program->philo[i]) != 0)
+		if (pthread_create(&program->philo[i].lifespan, NULL,
+				&routine, &program->philo[i]) != 0)
 		{
 			printf("Error: failed to create philosopher thread\n");
 			return (false);
 		}
+		i++;
 	}
 	if (pthread_create(&monitor_thread, NULL, &monitor, program) != 0)
 	{
 		printf("Error: failed to create monitor thread\n");
 		return (false);
 	}
-	for (i = 0; i < program->args.philos_n; i++)
+	while (i < program->args.philos_n)
+	{
 		pthread_join(program->philo[i].lifespan, NULL);
+		i++;
+	}
 	pthread_join(monitor_thread, NULL);
 	print_status(program);
-	print_mealcount(program); // debugger for meal count
+	print_mealcount(program);
 	return (true);
 }
 
-
 bool	init_philos(t_data *program)
 {
-	int i;
+	int	i;
 
 	program->philo = malloc(sizeof(t_philos) * program->args.philos_n);
 	if (!program->philo)
@@ -164,9 +158,10 @@ bool	init_philos(t_data *program)
 		program->philo[i].id = i + 1;
 		program->philo[i].args = &program->args;
 		program->philo[i].meals_n = 0;
-		program->philo[i].left_fork = &program->forks[i]; // left fork equal to philo n
-		if(i == 0) // philo[0] 1 should get fork[last_i] philos_n-1
-			program->philo[i].right_fork = &program->forks[program->args.philos_n - 1];
+		program->philo[i].left_fork = &program->forks[i];
+		if (i == 0)
+			program->philo[i].right_fork = &program->forks
+			[program->args.philos_n - 1];
 		else
 			program->philo[i].right_fork = &program->forks[i - 1];
 		program->philo[i].elapsed_time = 0;
@@ -183,7 +178,7 @@ bool	init_philos(t_data *program)
 
 bool	init_forks(t_data *program)
 {
-	int i;
+	int	i;
 
 	program->forks = malloc(sizeof(pthread_mutex_t) * program->args.philos_n);
 	if (!program->forks)
@@ -191,25 +186,25 @@ bool	init_forks(t_data *program)
 		printf("Error: malloc of t_data program->forks failed\n");
 		return (false);
 	}
-	i = 0; // as it's an array we loop from 0 to philos_n - 1
-	while(i < program->args.philos_n) // if philos_n is 50, we have 50 forks indexed 0 to 49
+	i = 0;
+	while (i < program->args.philos_n)
 	{
 		pthread_mutex_init(&program->forks[i], NULL);
 		i++;
 	}
-	return(true);
+	return (true);
 }
 
 bool	check_values(t_rules *args)
 {
-	if(args->philos_n < 1 || args->ttd < 1 || args->tte < 1 || args->tts < 1)
+	if (args->philos_n < 1 || args->ttd < 1 || args->tte < 1 || args->tts < 1)
 	{
-		printf("Error: the first 4 values should be greater than 0\n"); // check if greater than 0 or -1
+		printf("Error: the first 4 values should be greater than 0\n");
 		return (false);
 	}
-	if(args->philos_n > 200)
+	if (args->philos_n > 200)
 	{
-		printf("Error: not allowed to test philos_n greater than 200\n"); // check if needed
+		printf("Error: not allowed to test philos_n greater than 200\n");
 		return (false);
 	}
 	// what about intmax limit for args???
@@ -225,20 +220,20 @@ bool	init_data(int argc, char **argv, t_data *program)
 	program->args.found_dead = false;
 	pthread_mutex_init(&program->args.dead_lock, NULL);
 	pthread_mutex_init(&program->args.status_lock, NULL);
-	pthread_mutex_init(&program->args.meal_lock, NULL); // alert tahet tells other philos to die if someone is dead
+	pthread_mutex_init(&program->args.meal_lock, NULL);
 	pthread_mutex_init(&program->args.output_lock, NULL);
-	program->args.unix_start = get_unix_timestamp(); // ms since 1970 to start of program, does not need conversion (it's in milliseconds)
+	program->args.unix_start = get_unix_timestamp();
 	if (argc == 6)
 		program->args.meals_limit = ft_atoi(argv[5]);
 	else
-		program->args.meals_limit = -1; // no limit should be given if not inputed from the user
-	if(!check_values(&program->args))
+		program->args.meals_limit = -1;
+	if (!check_values(&program->args))
 		return (false);
-	if(!init_forks(program))
+	if (!init_forks(program))
 		return (false);
-	if(!init_philos(program))
+	if (!init_philos(program))
 		return (false);
-	if(program->args.meals_limit == 0)// should 0 mean no meals or no stop
+	if (program->args.meals_limit == 0)
 		return (false);
 	return (true);
 }
