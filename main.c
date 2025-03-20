@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:46:53 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/20 18:26:02 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/20 19:15:31 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ void	cleanup(t_data *program)
 		free(program->forks);
 	if (program->philo)
 		free(program->philo);
+	free(program);
 }
 
 
@@ -57,13 +58,19 @@ bool	parse_args(int argc, char **argv)
 
 int	main(int argc, char **argv)
 {
-	t_data				program;
-	t_philos			philosopher[200];
+	t_data				*program;
+	program = malloc(sizeof(t_data));
+	int return_value;
 
-	if (!parse_args(argc, argv) || !init_data(argc, argv, &program))
-		return (1);
-	if (!start_simulation(&program))
-		return (1);
-	cleanup(&program);
-	return (0);
+	if (!parse_args(argc, argv))
+	{
+		free(program);
+		return(1);
+	}
+	else if (!init_data(argc, argv, program) || !start_simulation(program))
+		return_value = 1;
+	else
+		return_value = 0;
+	cleanup(program);
+	return (return_value);
 }

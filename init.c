@@ -6,65 +6,80 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/20 17:59:37 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/20 19:17:11 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philos.h"
 
+bool	meal_check(t_philos *philo, int *group_ate_enough)
+{
+	// should work without races
+	pthread_mutex_lock(&philo->args->meal_lock);// i would call it activity lock
+	if(philo->args->meals_limit != -1) // checks every philo to see if meals are met
+	{
+
+		if (philo->meals_n >= philo->args->meals_limit) // checks every philo to see if meals are met
+			(*group_ate_enough)++;
+		pthread_mutex_unlock(&philo->args->meal_lock);// i would call it activity lock
+		if (*group_ate_enough == philo->args->philos_n)// after looping philo 1 by one we checked if all reached the eat_limit
+		{
+			pthread_mutex_lock(&philo->args->status_lock);// i would call it activity lock
+			philo->args->found_dead = true;
+			pthread_mutex_unlock(&philo->args->status_lock);// i would call it activity lock
+			return(true);
+		}
+	}
+	else
+		pthread_mutex_unlock(&philo->args->meal_lock);// i would call it activity lock
+	return(false);
+}
+
+bool	found_death(t_philos *philo)
+{
+	// monitor death
+	pthread_mutex_lock(&philo->args->output_lock);// i would call it activity lock
+	// printf("---[MONITOR]--- philo %d\n", i);
+		pthread_mutex_lock(&philo->args->status_lock);// i would call it activity lock
+		// philo->elapsed_time = get_curr_ms(philo->args->unix_start) - philo->ref_time;
+		philo->elapsed_time = get_curr_ms(philo->args->unix_start) - philo->last_meal_time;
+		pthread_mutex_unlock(&philo->args->status_lock);// i would call it activity lock
+		// if(program->philo->is_dead)
+	// printf(DEATH"%d ELAPSED %zu\n"RESET, philo->id, philo->elapsed_time);// i would call it activity lock
+
+	if(philo->elapsed_time >= philo->args->ttd && !philo->is_eating)
+	{
+		// printf(DEATH"---[MONITOR]--- philo %d\nisdead\n"RESET, i+1);
+		printf(DEATH"%zu %d is dead"RESET, get_curr_ms(philo->args->unix_start), philo->id);// i would call it activity lock
+		routine_debugging(philo);
+		pthread_mutex_lock(&philo->args->status_lock);// i would call it activity lock
+		philo->is_dead = true;
+		philo->args->found_dead = true;
+		pthread_mutex_unlock(&philo->args->status_lock);// i would call it activity lock
+		pthread_mutex_unlock(&philo->args->output_lock);// i would call it activity lock
+		return(true);
+	}
+	pthread_mutex_unlock(&philo->args->output_lock);// i would call it activity lock
+	return(false);
+}
+
 void *monitor(void *arg)
 {
-	t_data *program = (t_data *)arg;
-	int	i;
+	t_data	*program;
+	int		group_ate_enough;
+	int		i;
 
+	program = (t_data *)arg;
+	i = 0;
 	while (1) //if monitor_death || monitor_meals is true, return  null
 	{
-		int group_ate_enough = 0;
+		group_ate_enough = 0;
 		for (i = 0; i < program->args.philos_n; i++)
 		{
-			// count meals
-			pthread_mutex_lock(&program->philo[i].args->meal_lock);// i would call it activity lock
-			if(program->philo[i].args->meals_limit != -1) // checks every philo to see if meals are met
-			{
-
-				if (program->philo[i].meals_n >= program->args.meals_limit) // checks every philo to see if meals are met
-				group_ate_enough++;
-				pthread_mutex_unlock(&program->philo[i].args->meal_lock);// i would call it activity lock
-				if (group_ate_enough == program->args.philos_n)// after looping philo 1 by one we checked if all reached the eat_limit
-				{
-					pthread_mutex_lock(&program->philo[i].args->status_lock);// i would call it activity lock
-					program->args.found_dead = true;
-					pthread_mutex_unlock(&program->philo[i].args->status_lock);// i would call it activity lock
-					return(NULL);
-				}
-			}
-			else
-				pthread_mutex_unlock(&program->philo[i].args->meal_lock);// i would call it activity lock
-
-
-			// monitor death
-			pthread_mutex_lock(&program->philo[i].args->output_lock);// i would call it activity lock
-			// printf("---[MONITOR]--- philo %d\n", i);
-				pthread_mutex_lock(&program->philo[i].args->status_lock);// i would call it activity lock
-				// program->philo[i].elapsed_time = get_curr_ms(program->philo[i].args->unix_start) - program->philo[i].ref_time;
-				program->philo[i].elapsed_time = get_curr_ms(program->philo[i].args->unix_start) - program->philo[i].last_meal_time;
-				pthread_mutex_unlock(&program->philo[i].args->status_lock);// i would call it activity lock
-				// if(program->philo->is_dead)
-			// printf(DEATH"%d ELAPSED %zu\n"RESET, program->philo[i].id, program->philo[i].elapsed_time);// i would call it activity lock
-
-			if(program->philo[i].elapsed_time >= program->args.ttd && !program->philo[i].is_eating)
-			{
-				// printf(DEATH"---[MONITOR]--- philo %d\nisdead\n"RESET, i+1);
-				printf(DEATH"%zu %d is dead"RESET, get_curr_ms(program->args.unix_start), program->philo[i].id);// i would call it activity lock
-				routine_debugging(&program->philo[i]);
-				pthread_mutex_lock(&program->philo[i].args->status_lock);// i would call it activity lock
-				program->philo[i].is_dead = true;
-				program->args.found_dead = true;
-				pthread_mutex_unlock(&program->philo[i].args->status_lock);// i would call it activity lock
-				pthread_mutex_unlock(&program->philo[i].args->output_lock);// i would call it activity lock
+			if(meal_check(&program->philo[i], &group_ate_enough))
 				return(NULL);
-			}
-			pthread_mutex_unlock(&program->philo[i].args->output_lock);// i would call it activity lock
+			if(found_death(&program->philo[i]))// should work fine
+				return(NULL);
 		}
 		usleep(500);
 	}
@@ -72,7 +87,7 @@ void *monitor(void *arg)
 }
 
 
-bool someone_died(t_philos *philo)
+bool death_alert(t_philos *philo)
 {
 	pthread_mutex_lock(&philo->args->status_lock);// i would call it activity lock
 	if (philo->args->found_dead || philo->is_dead)
@@ -94,7 +109,7 @@ void *routine(void *arg)
 		ft_usleep(1, philo); // delay to avoid even philos to be quicker than odd
 			// usleep((philo->args->tte * 100) / philo->args->philos_n); // delay to avoid even philos to be quicker than odd
 
-	while (!someone_died(philo)) // why not using the starvation fucntion here instead?
+	while (!death_alert(philo)) // why not using the starvation fucntion here instead?
 	{
 		if(philo->id % 2 != 0) // odd get first the left (theirs) and teh right (i - 1)
 			eats(philo, philo->left_fork, philo->right_fork);
@@ -111,8 +126,6 @@ bool start_simulation(t_data *program)
 {
 	pthread_t monitor_thread;
 	int i;
-
-	// Create philosopher threads
 	for (i = 0; i < program->args.philos_n; i++)
 	{
 		if (pthread_create(&program->philo[i].lifespan, NULL, &routine, &program->philo[i]) != 0)
@@ -121,24 +134,16 @@ bool start_simulation(t_data *program)
 			return (false);
 		}
 	}
-
-	// Create monitor thread
 	if (pthread_create(&monitor_thread, NULL, &monitor, program) != 0)
 	{
 		printf("Error: failed to create monitor thread\n");
 		return (false);
 	}
-
-	// Wait for philosophers to finish
 	for (i = 0; i < program->args.philos_n; i++)
 		pthread_join(program->philo[i].lifespan, NULL);
-
-	// Wait for monitor to finish
 	pthread_join(monitor_thread, NULL);
 	print_status(program);
 	print_mealcount(program); // debugger for meal count
-
-
 	return (true);
 }
 
@@ -171,10 +176,6 @@ bool	init_philos(t_data *program)
 		program->philo[i].is_sleeping = false;
 		program->philo[i].is_thinking = false;
 		program->philo[i].is_dead = false;
-		// printf(SLEEP"	Philo %d: left_fork = fork[%ld], right_fork = fork[%ld]\n"RESET,
-		// program->philo[i].id,
-		// program->philo[i].left_fork - program->forks,
-		// program->philo[i].right_fork - program->forks);
 		i++;
 	}
 	return (true);
@@ -201,7 +202,6 @@ bool	init_forks(t_data *program)
 
 bool	check_values(t_rules *args)
 {
-	// printf("INIT.C LINE 17---> philos_n: %d, ttd: %d, tte: %d, tts: %d meals_limit: %d\n", args->philos_n, args->ttd, args->tte, args->tts, args->meals_limit);
 	if(args->philos_n < 1 || args->ttd < 1 || args->tte < 1 || args->tts < 1)
 	{
 		printf("Error: the first 4 values should be greater than 0\n"); // check if greater than 0 or -1
@@ -212,13 +212,12 @@ bool	check_values(t_rules *args)
 		printf("Error: not allowed to test philos_n greater than 200\n"); // check if needed
 		return (false);
 	}
-	// what about intmax limit?
+	// what about intmax limit for args???
 	return (true);
 }
 
 bool	init_data(int argc, char **argv, t_data *program)
 {
-	// program = malloc(sizeof(t_data));
 	program->args.philos_n = ft_atoi(argv[1]);
 	program->args.ttd = ft_atoi(argv[2]);
 	program->args.tte = ft_atoi(argv[3]);
