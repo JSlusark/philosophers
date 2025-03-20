@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:46:53 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/20 10:42:31 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/20 16:25:43 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,23 +17,17 @@ void cleanup(t_data *program) {
 	for (int i = 0; i < program->args.philos_n; i++) {
 		pthread_mutex_destroy(&program->forks[i]);
 	}
+	pthread_mutex_destroy(&program->args.dead_lock);
+	pthread_mutex_destroy(&program->args.status_lock);
+	pthread_mutex_destroy(&program->args.meal_lock);
+	pthread_mutex_destroy(&program->args.output_lock);
 
 	// Free memory
-	if (program->forks)
+	if (program->forks) // fork array was malloced but fork mutexes destroyed
 		free(program->forks);
-	if (program->philo)
+	if (program->philo) // philo array was malloced but philo threads destroyed
 		free(program->philo);
 }
-
-// void cleanup(t_data *program)
-// {
-// 	for (int i = 0; i < program->args.philos_n; i++)
-// 		pthread_mutex_destroy(&program->forks[i]);
-// 	free(program->forks);
-// 	free(program->philo);
-// }
-
-
 
 
 bool	parse_args(int argc, char **argv)
@@ -67,6 +61,6 @@ int main(int argc, char **argv)
 		return (1); // remember to free and close stuff
 	if (!start_simulation(&program))
 		return (1); // remember to free and close stuff
-	// cleanup(&program);
+	cleanup(&program);
 	return(0);
 }

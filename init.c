@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/20 12:13:44 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/20 16:22:35 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,8 +149,8 @@ bool start_simulation(t_data *program)
 
 	// Wait for monitor to finish
 	pthread_join(monitor_thread, NULL);
-	print_status(program);
-	print_mealcount(program); // debugger for meal count
+	// print_status(program);
+	// print_mealcount(program); // debugger for meal count
 
 
 	return (true);
@@ -179,6 +179,7 @@ bool	init_philos(t_data *program)
 		else
 			program->philo[i].right_fork = &program->forks[i - 1];
 		program->philo[i].elapsed_time = 0;
+		program->philo[i].last_meal_time = 0;
 		program->philo[i].start_activity = 0;
 		program->philo[i].is_eating = false;
 		program->philo[i].is_sleeping = false;
@@ -256,12 +257,3 @@ bool	init_data(int argc, char **argv, t_data *program)
 		return (false);
 	return (true);
 }
-
-// void cleanup(t_data *program)
-// {
-// 	for (int i = 0; i < program->args.philos_n; i++)
-// 		pthread_mutex_destroy(&program->forks[i]);
-// 	free(program->forks);
-// 	free(program->philo);
-// }
-
