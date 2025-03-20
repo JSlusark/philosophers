@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/20 17:27:38 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/20 17:42:08 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,8 +149,8 @@ bool start_simulation(t_data *program)
 
 	// Wait for monitor to finish
 	pthread_join(monitor_thread, NULL);
-	// print_status(program);
-	// print_mealcount(program); // debugger for meal count
+	print_status(program);
+	print_mealcount(program); // debugger for meal count
 
 
 	return (true);
