@@ -6,24 +6,33 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/20 18:07:28 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/20 19:25:25 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philos.h"
 
-void	print_activity(t_philos *philo, size_t time, char *message, size_t delay)
+bool	lonely_philo(t_philos *philo, pthread_mutex_t *first_fork)
 {
-	pthread_mutex_lock(&philo->args->output_lock);
-	philo->elapsed_time = get_curr_ms(philo->args->unix_start) - philo->last_meal_time;
-	pthread_mutex_lock(&philo->args->status_lock);
+	if (philo->args->philos_n == 1)
+	{
+		usleep(philo->args->ttd * 1000);
+		pthread_mutex_unlock(first_fork);
+		return (true);
+	}
+	return (false);
+}
+
+
+bool	interrupt_activity(t_philos *philo) // should be fine
+{
 	if(philo->args->found_dead)
 	{
 		// printf("[DEBUG] %d FOUND SOMEONE DEAD %s", philo->id, message);
 		// printf("________ death - %d:%d or someone\n", philo->is_dead, philo->args->found_dead);
 		pthread_mutex_unlock(&philo->args->status_lock);
 		pthread_mutex_unlock(&philo->args->output_lock);
-		return;
+		return(true);
 	}
 	if( philo->elapsed_time >= philo->args->ttd && !philo->is_eating)
 	{
@@ -34,13 +43,23 @@ void	print_activity(t_philos *philo, size_t time, char *message, size_t delay)
 		philo->args->found_dead = true;
 		pthread_mutex_unlock(&philo->args->status_lock);
 		pthread_mutex_unlock(&philo->args->output_lock);
-		return;
+		return(true);
 	}
+	return(false);
+}
+
+void	print_activity(t_philos *philo, size_t time, char *message, size_t delay)
+{
+	pthread_mutex_lock(&philo->args->output_lock);
+	philo->elapsed_time = get_curr_ms(philo->args->unix_start) - philo->last_meal_time;
+	pthread_mutex_lock(&philo->args->status_lock);
+	if(interrupt_activity(philo))
+		return;
 	pthread_mutex_unlock(&philo->args->status_lock);
 	printf("%zu %d %s", time, philo->id, message);
 	routine_debugging(philo);
 	pthread_mutex_unlock(&philo->args->output_lock);
-	if(delay >= 1) /// unsure to include 0 here
+	if(delay >= 1)
 		usleep(delay * 1000);
 	else
 		usleep(500);
@@ -57,6 +76,8 @@ void	thinks(t_philos *philo)
 		THINK"is thinking     "RESET, 0);
 }
 
+
+
 void	sleeps(t_philos *philo)
 {
 	pthread_mutex_lock(&philo->args->status_lock);
@@ -65,23 +86,19 @@ void	sleeps(t_philos *philo)
 	philo->is_sleeping = true;
 	pthread_mutex_unlock(&philo->args->status_lock);
 	print_activity(philo, get_curr_ms(philo->args->unix_start),
-		SLEEP"is sleeping"RESET, philo->args->tts);
+	SLEEP"is sleeping"RESET, philo->args->tts);
 }
 
 void	eats(t_philos *philo, pthread_mutex_t *first_fork, pthread_mutex_t *second_fork)
- {
+{
 	pthread_mutex_lock(first_fork);
 	print_activity(philo, get_curr_ms(philo->args->unix_start),
-		FORK2"has taken a fork"RESET, 0);
-	if (philo->args->philos_n == 1)
-	{
-		usleep(philo->args->ttd * 1000);
-		pthread_mutex_unlock(first_fork);
+	FORK2"has taken a fork"RESET, 0);
+	if(lonely_philo(philo, first_fork))
 		return ;
-	}
 	pthread_mutex_lock(second_fork);
 	print_activity(philo, get_curr_ms(philo->args->unix_start),
-		FORK2"has taken a fork"RESET, 0);
+	FORK2"has taken a fork"RESET, 0);
 	pthread_mutex_lock(&philo->args->status_lock);
 	philo->last_meal_time = get_curr_ms(philo->args->unix_start);
 	philo->is_eating = true;
@@ -96,5 +113,4 @@ void	eats(t_philos *philo, pthread_mutex_t *first_fork, pthread_mutex_t *second_
 	pthread_mutex_unlock(first_fork);
 	usleep(500);// <----- I ADDED THIS DELAY TO HELP WITH  3 610 200 100 (which delay was coming from fork release delay
 	pthread_mutex_unlock(second_fork);
- }
-
+}
