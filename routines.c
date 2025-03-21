@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   routine.c                                          :+:      :+:    :+:   */
+/*   routines.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/21 10:55:40 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/21 13:12:50 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,22 +14,23 @@
 
 bool	interrupt_activity(t_philos *philo)
 {
+	bool	interrupted;
+
+	interrupted = false;
 	if (philo->args->found_dead)
+		interrupted = true;
+	else if (philo->elapsed_time >= philo->args->ttd && !philo->is_eating)
 	{
-		pthread_mutex_unlock(&philo->args->status_lock);
-		pthread_mutex_unlock(&philo->args->output_lock);
-		return (true);
-	}
-	if (philo->elapsed_time >= philo->args->ttd && !philo->is_eating)
-	{
-		philo->is_dead = true;
 		philo->is_dead = true;
 		philo->args->found_dead = true;
+		interrupted = true;
+	}
+	if (interrupted)
+	{
 		pthread_mutex_unlock(&philo->args->status_lock);
 		pthread_mutex_unlock(&philo->args->output_lock);
-		return (true);
 	}
-	return (false);
+	return (interrupted);
 }
 
 void	print_activity(t_philos *philo, size_t time,

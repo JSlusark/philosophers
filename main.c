@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:46:53 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/21 12:22:27 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/21 13:16:50 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,14 @@ bool	check_values(t_rules *args)
 		printf("Error: not allowed to test philos_n greater than 200\n");
 		return (false);
 	}
-	// what about intmax limit for args???
+	if (args->ttd > INT_MAX || args->tte > INT_MAX || args->tts > INT_MAX
+		|| args->meals_limit > INT_MAX)
+	{
+		printf("Error: argument exceeds INT_MAX\n");
+		return (false);
+	}
+	if (args->meals_limit == 0)
+		return (false);
 	return (true);
 }
 
@@ -79,10 +86,15 @@ bool	parse_args(int argc, char **argv)
 
 int	main(int argc, char **argv)
 {
-	t_data				*program;
-	int					return_value;
+	t_data	*program;
+	int		return_value;
 
 	program = malloc(sizeof(t_data));
+	if (!program)
+	{
+		printf("Error: malloc of t_data failed\n");
+		return (1);
+	}
 	if (!parse_args(argc, argv) || !init_data(argc, argv, program))
 	{
 		free(program);

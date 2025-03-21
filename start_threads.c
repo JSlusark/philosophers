@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   simulation.c                                       :+:      :+:    :+:   */
+/*   start_threads.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 10:54:46 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/21 11:34:22 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/21 13:13:32 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,8 @@ bool	create_lifespan_threads(t_data *program)
 				&routine, &program->philo[i]) != 0)
 		{
 			printf("Error: failed to create philosopher thread\n");
+			while (--i >= 0)
+				pthread_join(program->philo[i].lifespan, NULL);
 			return (false);
 		}
 		i++;
