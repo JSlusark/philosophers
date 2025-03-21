@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 10:11:49 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/21 11:50:48 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/21 16:04:59 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,9 +42,8 @@ bool	found_death(t_philos *philo)
 	pthread_mutex_unlock(&philo->args->status_lock);
 	if (philo->elapsed_time >= philo->args->ttd && !philo->is_eating)
 	{
-		printf(DEATH"%zu %d died"RESET,
+		printf(DEATH"%zu %d died\n"RESET,
 			get_curr_ms(philo->args->unix_start), philo->id);
-		routine_debugging(philo);
 		pthread_mutex_lock(&philo->args->status_lock);
 		philo->is_dead = true;
 		philo->args->found_dead = true;

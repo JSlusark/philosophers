@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/21 14:39:32 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/21 15:30:24 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ void	thinks(t_philos *philo)
 	philo->is_sleeping = false;
 	pthread_mutex_unlock(&philo->args->status_lock);
 	print_activity(philo, get_curr_ms(philo->args->unix_start),
-		THINK"is thinking     "RESET, 0);
+		THINK"is thinking"RESET, 0);
 }
 
 void	sleeps(t_philos *philo)
@@ -94,7 +94,7 @@ void	eats(t_philos *philo,
 	philo->meals_n++;
 	pthread_mutex_unlock(&philo->args->meal_lock);
 	pthread_mutex_unlock(&philo->args->status_lock);
-	print_activity(philo, philo->last_meal_time, "is eating  ",
+	print_activity(philo, philo->last_meal_time, "is eating",
 		philo->args->tte);
 	usleep(500);
 	pthread_mutex_unlock(first_fork);
