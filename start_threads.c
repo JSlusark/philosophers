@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 10:54:46 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/21 14:29:30 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/21 14:40:20 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,5 @@ bool	start_simulation(t_data *program)
 		i++;
 	}
 	pthread_join(monitor_thread, NULL);
-	print_status(program);
-	print_mealcount(program);
 	return (true);
 }

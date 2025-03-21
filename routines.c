@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/21 13:12:50 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/21 14:39:32 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,7 @@ void	print_activity(t_philos *philo, size_t time,
 	if (interrupt_activity(philo))
 		return ;
 	pthread_mutex_unlock(&philo->args->status_lock);
-	printf("%zu %d %s", time, philo->id, message);
-	routine_debugging(philo);
+	printf("%zu %d %s\n", time, philo->id, message);
 	pthread_mutex_unlock(&philo->args->output_lock);
 	if (delay >= 1)
 		usleep(delay * 1000);
