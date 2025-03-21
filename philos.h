@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:47:09 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/20 18:34:35 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/21 11:42:24 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,26 +74,44 @@ typedef struct s_data
 	pthread_mutex_t	*forks;
 }	t_data;
 
-// Utility functions
+// main functions
+bool	parse_args(int argc, char **argv);
+bool	check_values(t_rules *args);
+bool	init_data(int argc, char **argv, t_data *program);
+void	cleanup(t_data *program);
+
+// allocating functions
+bool	init_forks(t_data *program);
+bool	init_philos(t_data *program);
+void	init_status(t_data *program, int *i);
+
+// starting threads functions
+bool	start_simulation(t_data *program);
+bool	create_lifespan_threads(t_data *program);
+void	*routine(void *arg);
+bool	death_alert(t_philos *philo);
+bool	lonely_philo(t_philos *philo, pthread_mutex_t *first_fork);
+
+// routine  functions
+void	eats(t_philos *philo, pthread_mutex_t *first_fork,
+			pthread_mutex_t *second_fork);
+void	sleeps(t_philos *philo);
+void	thinks(t_philos *philo);
+void	print_activity(t_philos *philo, size_t time,
+			char *message, size_t delay);
+bool	interrupt_activity(t_philos *philo);
+
+// monitor functions
+void	*monitor(void *arg);
+bool	found_death(t_philos *philo);
+bool	meal_check(t_philos *philo, int *group_ate_enough);
+
+// utility functions
 size_t	get_curr_ms(long start);
 long	get_unix_timestamp(void);
 int		ft_atoi(const char *nptr);
 void	ft_usleep(size_t milliseconds, t_philos *philo);
-// Initialization functions
-bool	init_data(int argc, char **argv, t_data *program);
-bool	init_philos(t_data *program);
-bool	init_forks(t_data *program);
-// Simulation functions
-bool	start_simulation(t_data *program);
-void	*routine(void *arg); // starts the routine of each philosopher
-void	thinks(t_philos *philo);
-void	eats(t_philos *philo, pthread_mutex_t *first_fork,
-			pthread_mutex_t *second_fork);
-void	sleeps(t_philos *philo);
-void	cleanup(t_data *program);
-void	*monitor(void *arg);
-void	print_activity(t_philos *philo, size_t time,
-			char *message, size_t delay);
+
 //testing and debugging
 void	routine_debugging(t_philos *philo);
 void	print_status(t_data *program);

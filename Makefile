@@ -6,7 +6,7 @@
 #    By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/15 17:49:39 by jjs               #+#    #+#              #
-#    Updated: 2025/03/20 17:14:58 by jslusark         ###   ########.fr        #
+#    Updated: 2025/03/21 12:30:56 by jslusark         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -37,8 +37,10 @@ REMOVE = rm -rf
 
 # Source files
 SRC = main.c \
-	init.c \
-	routine.c \
+	init_allocation.c \
+	start_threads.c \
+	monitor.c \
+	routines.c \
 	utils.c \
 	debugging.c
 OBJ_DIR = obj

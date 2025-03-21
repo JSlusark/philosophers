@@ -6,22 +6,11 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/21 10:10:07 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/21 10:55:40 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philos.h"
-
-bool	lonely_philo(t_philos *philo, pthread_mutex_t *first_fork)
-{
-	if (philo->args->philos_n == 1)
-	{
-		usleep(philo->args->ttd * 1000);
-		pthread_mutex_unlock(first_fork);
-		return (true);
-	}
-	return (false);
-}
 
 bool	interrupt_activity(t_philos *philo)
 {

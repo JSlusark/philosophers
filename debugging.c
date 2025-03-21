@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/20 17:30:23 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/20 18:12:39 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/21 11:48:47 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,10 +90,7 @@ void	print_status(t_data *program)
 	printf("TTD: %s%zums%s | ", DEATH, program->args.ttd, RESET);
 	printf("TTE: %zums | ", program->args.tte);
 	printf("TTS: %zums | ", program->args.tts);
-	printf("Meal Limit: %s%d%s\n",
-		(program->args.meals_limit > 0 ? GREEN : RESET),
-		program->args.meals_limit,
-		RESET);
+	printf("Meal Limit: %d\n", program->args.meals_limit);
 	printf("\nPhilosopher Status at End of Simulation:\n");
 	printf("------------------------------------------------------------\n");
 	while (i < program->args.philos_n)
