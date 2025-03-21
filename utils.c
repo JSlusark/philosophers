@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 15:05:39 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/21 13:12:57 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/21 14:30:28 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,13 +60,4 @@ int	ft_atoi(const char *nptr)
 		i++;
 	}
 	return (num * sign);
-}
-
-void	ft_usleep(size_t milliseconds, t_philos *philo)
-{
-	size_t	start;
-
-	start = get_curr_ms(philo->args->unix_start);
-	while ((get_curr_ms(philo->args->unix_start) - start) < milliseconds)
-		usleep(500);
 }

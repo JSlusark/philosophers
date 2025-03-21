@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 10:54:46 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/21 13:13:32 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/21 14:29:30 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ void	*routine(void *arg)
 
 	philo = (t_philos *)arg;
 	if (philo->id % 2 == 0)
-		ft_usleep(1, philo);
+		usleep(philo->args->tte * 100 / philo->args->philos_n);
 	while (!death_alert(philo))
 	{
 		if (philo->id % 2 != 0)
