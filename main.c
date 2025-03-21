@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 13:46:53 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/20 19:15:31 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/21 10:09:37 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ void	cleanup(t_data *program)
 	free(program);
 }
 
-
 bool	parse_args(int argc, char **argv)
 {
 	int	i;
@@ -59,13 +58,13 @@ bool	parse_args(int argc, char **argv)
 int	main(int argc, char **argv)
 {
 	t_data				*program;
-	program = malloc(sizeof(t_data));
-	int return_value;
+	int					return_value;
 
+	program = malloc(sizeof(t_data));
 	if (!parse_args(argc, argv))
 	{
 		free(program);
-		return(1);
+		return (1);
 	}
 	else if (!init_data(argc, argv, program) || !start_simulation(program))
 		return_value = 1;

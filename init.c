@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 11:54:18 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/20 20:13:37 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/21 10:09:18 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,8 @@ bool	found_death(t_philos *philo)
 	pthread_mutex_unlock(&philo->args->status_lock);
 	if (philo->elapsed_time >= philo->args->ttd && !philo->is_eating)
 	{
-		printf(DEATH"%zu %d is dead"RESET, get_curr_ms(philo->args->unix_start), philo->id);
+		printf(DEATH"%zu %d is dead"RESET,
+			get_curr_ms(philo->args->unix_start), philo->id);
 		routine_debugging(philo);
 		pthread_mutex_lock(&philo->args->status_lock);
 		philo->is_dead = true;
@@ -142,6 +143,26 @@ bool	start_simulation(t_data *program)
 	return (true);
 }
 
+void	init_status(t_data *program, int *i)
+{
+	program->philo[*i].id = (*i) + 1;
+	program->philo[*i].args = &program->args;
+	program->philo[*i].meals_n = 0;
+	program->philo[*i].left_fork = &program->forks[*i];
+	if (*i == 0)
+		program->philo[*i].right_fork = &program->forks
+		[program->args.philos_n - 1];
+	else
+		program->philo[*i].right_fork = &program->forks[(*i) - 1];
+	program->philo[*i].elapsed_time = 0;
+	program->philo[*i].last_meal_time = 0;
+	program->philo[*i].start_activity = 0;
+	program->philo[*i].is_eating = false;
+	program->philo[*i].is_sleeping = false;
+	program->philo[*i].is_thinking = false;
+	program->philo[*i].is_dead = false;
+}
+
 bool	init_philos(t_data *program)
 {
 	int	i;
@@ -153,24 +174,9 @@ bool	init_philos(t_data *program)
 		return (false);
 	}
 	i = 0;
-	while(i < program->args.philos_n)
+	while (i < program->args.philos_n)
 	{
-		program->philo[i].id = i + 1;
-		program->philo[i].args = &program->args;
-		program->philo[i].meals_n = 0;
-		program->philo[i].left_fork = &program->forks[i];
-		if (i == 0)
-			program->philo[i].right_fork = &program->forks
-			[program->args.philos_n - 1];
-		else
-			program->philo[i].right_fork = &program->forks[i - 1];
-		program->philo[i].elapsed_time = 0;
-		program->philo[i].last_meal_time = 0;
-		program->philo[i].start_activity = 0;
-		program->philo[i].is_eating = false;
-		program->philo[i].is_sleeping = false;
-		program->philo[i].is_thinking = false;
-		program->philo[i].is_dead = false;
+		init_status(program, &i);
 		i++;
 	}
 	return (true);

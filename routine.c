@@ -6,7 +6,7 @@
 /*   By: jslusark <jslusark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:58:30 by jslusark          #+#    #+#             */
-/*   Updated: 2025/03/20 19:28:22 by jslusark         ###   ########.fr       */
+/*   Updated: 2025/03/21 10:10:07 by jslusark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,7 @@ void	sleeps(t_philos *philo)
 	print_activity(philo, get_curr_ms(philo->args->unix_start),
 		SLEEP"is sleeping"RESET, philo->args->tts);
 }
+
 void	eats(t_philos *philo,
 	pthread_mutex_t *first_fork,
 	pthread_mutex_t *second_fork)
